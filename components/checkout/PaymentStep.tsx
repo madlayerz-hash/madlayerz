@@ -10,7 +10,7 @@ export function PaymentStep({ onConfirm }: { onConfirm: (method: PaymentMethodIn
     <div className="glass-card flex flex-col gap-4 p-6">
       <h2 className="text-lg font-bold">Método de pago</h2>
       <p className="text-sm opacity-80">
-        El pago aún no se procesa realmente — tu pedido quedará como "pendiente de pago" y te
+        El pago aún no se procesa realmente — tu pedido quedará como &quot;pendiente de pago&quot; y te
         contactaremos para coordinar el cobro.
       </p>
 
