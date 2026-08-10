@@ -25,7 +25,8 @@ export async function DELETE(request: Request) {
   const id = searchParams.get('id');
   if (!id) return NextResponse.json({ error: 'Falta el id' }, { status: 400 });
 
-  const { count } = await client.from('products').select('id', { count: 'exact', head: true }).eq('category_id', id);
+  const { count, error: countError } = await client.from('products').select('id', { count: 'exact', head: true }).eq('category_id', id);
+  if (countError) return NextResponse.json({ error: countError.message }, { status: 500 });
   if (count && count > 0) {
     return NextResponse.json({ error: 'No se puede eliminar: hay productos en esta categoría.' }, { status: 400 });
   }
