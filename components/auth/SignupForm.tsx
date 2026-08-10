@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { signupSchema } from '@/lib/validation/auth-schema';
 import { createBrowserSupabaseClient } from '@/lib/supabase/browser-client';
 
@@ -10,7 +9,6 @@ export function SignupForm() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [serverError, setServerError] = useState<string | null>(null);
   const [submitted, setSubmitted] = useState(false);
-  const router = useRouter();
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();

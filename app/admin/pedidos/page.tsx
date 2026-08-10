@@ -8,7 +8,7 @@ export default async function AdminPedidosPage() {
     .select('id, customer_name, customer_email, status, total_clp, region, address')
     .order('created_at', { ascending: false });
 
-  const rows = (orders ?? []).map((o: any) => ({
+  const rows = (orders ?? []).map((o: { id: string; customer_name: string; customer_email: string; status: string; total_clp: number; region: string | null; address: string | null }) => ({
     id: o.id,
     customerName: o.customer_name,
     customerEmail: o.customer_email,

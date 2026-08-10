@@ -1,7 +1,8 @@
 import { describe, it, expect, vi } from 'vitest';
+import type { SupabaseClient } from '@supabase/supabase-js';
 import { fetchAddresses, createAddress, updateAddress, deleteAddress } from './queries';
 
-function makeClient(overrides: Record<string, unknown> = {}) {
+function makeClient(overrides: Record<string, unknown> = {}): SupabaseClient {
   return {
     from: vi.fn(() => ({
       select: vi.fn(() => ({ eq: vi.fn(() => ({ order: vi.fn(async () => ({ data: [{ id: '1', user_id: 'u1', label: 'Casa', region: 'metropolitana', address: 'Av 123', is_default: true }], error: null })) })) })),
@@ -10,7 +11,7 @@ function makeClient(overrides: Record<string, unknown> = {}) {
       delete: vi.fn(() => ({ eq: vi.fn(async () => ({ error: null })) })),
       ...overrides,
     })),
-  } as any;
+  } as unknown as SupabaseClient;
 }
 
 describe('address queries', () => {

@@ -1,10 +1,11 @@
 import { describe, it, expect, vi } from 'vitest';
+import type { SupabaseClient } from '@supabase/supabase-js';
 import { createOrder, createQuoteRequest, fetchOrdersForUser } from './queries';
 
 describe('createOrder (RPC-based)', () => {
   it('calls the create_order RPC with the input and returns the id', async () => {
     const rpc = vi.fn(async () => ({ data: 'order-123', error: null }));
-    const client = { rpc } as any;
+    const client = { rpc } as unknown as SupabaseClient;
 
     const id = await createOrder(client, {
       customerName: 'Pablo',
@@ -27,7 +28,7 @@ describe('createOrder (RPC-based)', () => {
 describe('createQuoteRequest (RPC-based)', () => {
   it('calls the create_quote_request RPC and returns the id', async () => {
     const rpc = vi.fn(async () => ({ data: 'quote-123', error: null }));
-    const client = { rpc } as any;
+    const client = { rpc } as unknown as SupabaseClient;
 
     const id = await createQuoteRequest(client, {
       name: 'Pablo',
@@ -53,7 +54,7 @@ describe('fetchOrdersForUser', () => {
     const or = vi.fn(() => ({ order }));
     const select = vi.fn(() => ({ or }));
     const from = vi.fn(() => ({ select }));
-    const client = { from } as any;
+    const client = { from } as unknown as SupabaseClient;
 
     const orders = await fetchOrdersForUser(client, 'u1', 'pablo@example.com');
 

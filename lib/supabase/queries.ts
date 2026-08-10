@@ -95,7 +95,7 @@ export async function fetchAddresses(client: SupabaseClient, userId: string): Pr
 
   if (error) throw error;
 
-  return (data ?? []).map((row: any) => ({
+  return (data ?? []).map((row: { id: string; user_id: string; label: string; region: string; address: string; is_default: boolean }) => ({
     id: row.id,
     userId: row.user_id,
     label: row.label,
@@ -167,7 +167,7 @@ export async function fetchOrdersForUser(client: SupabaseClient, userId: string,
 
   if (error) throw error;
 
-  return (data ?? []).map((row: any) => ({
+  return (data ?? []).map((row: { id: string; created_at: string; status: string; total_clp: number }) => ({
     id: row.id,
     createdAt: row.created_at,
     status: row.status,

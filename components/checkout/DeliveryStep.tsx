@@ -37,7 +37,7 @@ export function DeliveryStep({
     }
   }
 
-  function useSavedAddress(saved: Address) {
+  function selectSavedAddress(saved: Address) {
     const savedCost = calculateShippingCost('domicilio', saved.region as Region);
     onContinue({ method: 'domicilio', region: saved.region as Region, address: saved.address }, savedCost);
   }
@@ -64,7 +64,7 @@ export function DeliveryStep({
                 <p className="font-semibold">{saved.label}</p>
                 <p className="text-sm opacity-80">{saved.address}</p>
               </div>
-              <button type="button" onClick={() => useSavedAddress(saved)} className="rounded-full bg-brand px-3 py-1 text-sm text-white">
+              <button type="button" onClick={() => selectSavedAddress(saved)} className="rounded-full bg-brand px-3 py-1 text-sm text-white">
                 Usar esta dirección
               </button>
             </div>

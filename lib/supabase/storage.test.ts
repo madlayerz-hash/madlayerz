@@ -1,11 +1,12 @@
 import { describe, it, expect, vi } from 'vitest';
+import type { SupabaseClient } from '@supabase/supabase-js';
 import { uploadProductImage } from './storage';
 
 describe('uploadProductImage', () => {
   it('uploads the file to the product-images bucket and returns the public URL', async () => {
     const upload = vi.fn(async () => ({ data: { path: 'llavero-nuevo-123.png' }, error: null }));
     const getPublicUrl = vi.fn(() => ({ data: { publicUrl: 'https://x.supabase.co/storage/v1/object/public/product-images/llavero-nuevo-123.png' } }));
-    const client = { storage: { from: vi.fn(() => ({ upload, getPublicUrl })) } } as any;
+    const client = { storage: { from: vi.fn(() => ({ upload, getPublicUrl })) } } as unknown as SupabaseClient;
 
     const file = new File(['fake-image-bytes'], 'llavero-nuevo.png', { type: 'image/png' });
     const url = await uploadProductImage(client, file);
