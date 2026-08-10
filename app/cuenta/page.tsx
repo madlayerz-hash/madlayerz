@@ -11,10 +11,18 @@ export default async function CuentaPage() {
 
   if (!userData.user) redirect('/cuenta/login');
 
-  const [orders, addresses] = await Promise.all([
-    fetchOrdersForUser(client, userData.user.id, userData.user.email ?? ''),
-    fetchAddresses(client, userData.user.id),
-  ]);
+  let orders: Awaited<ReturnType<typeof fetchOrdersForUser>> = [];
+  let addresses: Awaited<ReturnType<typeof fetchAddresses>> = [];
+
+  try {
+    [orders, addresses] = await Promise.all([
+      fetchOrdersForUser(client, userData.user.id, userData.user.email ?? ''),
+      fetchAddresses(client, userData.user.id),
+    ]);
+  } catch {
+    orders = [];
+    addresses = [];
+  }
 
   return (
     <main className="mx-auto max-w-2xl px-6 py-8">

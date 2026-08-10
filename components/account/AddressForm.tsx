@@ -30,11 +30,16 @@ export function AddressForm({ onSaved }: { onSaved: () => void }) {
     }
     setErrors({});
 
-    await fetch('/api/account/addresses', {
+    const response = await fetch('/api/account/addresses', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(result.data),
     });
+
+    if (!response.ok) {
+      setErrors({ form: 'No se pudo guardar la dirección. Intenta nuevamente.' });
+      return;
+    }
 
     setForm({ label: '', region: 'metropolitana', address: '', isDefault: false });
     onSaved();
@@ -43,6 +48,7 @@ export function AddressForm({ onSaved }: { onSaved: () => void }) {
   return (
     <form onSubmit={handleSubmit} className="glass-card flex flex-col gap-4 p-6">
       <h3 className="font-bold">Nueva dirección</h3>
+      {errors.form && <p className="text-sm text-red-500">{errors.form}</p>}
       <div>
         <label htmlFor="label">Nombre de la dirección</label>
         <input id="label" value={form.label} onChange={(e) => setForm({ ...form, label: e.target.value })} className="w-full rounded-full bg-transparent px-4 py-2" />

@@ -13,7 +13,13 @@ const REGION_LABELS: Record<string, string> = {
 
 export function AddressList({ addresses, onChange }: { addresses: Address[]; onChange: () => void }) {
   async function handleDelete(id: string) {
-    await fetch(`/api/account/addresses?id=${id}`, { method: 'DELETE' });
+    if (!confirm('¿Eliminar esta dirección?')) return;
+
+    const response = await fetch(`/api/account/addresses?id=${id}`, { method: 'DELETE' });
+    if (!response.ok) {
+      alert('No se pudo eliminar la dirección. Intenta nuevamente.');
+      return;
+    }
     onChange();
   }
 

@@ -12,8 +12,12 @@ export async function POST(request: Request) {
   const parsed = addressSchema.safeParse(body);
   if (!parsed.success) return NextResponse.json({ error: 'Datos inválidos' }, { status: 400 });
 
-  const id = await createAddress(client, { userId: userData.user.id, ...parsed.data });
-  return NextResponse.json({ id });
+  try {
+    const id = await createAddress(client, { userId: userData.user.id, ...parsed.data });
+    return NextResponse.json({ id });
+  } catch (error) {
+    return NextResponse.json({ error: (error as Error).message }, { status: 500 });
+  }
 }
 
 export async function DELETE(request: Request) {
@@ -25,6 +29,10 @@ export async function DELETE(request: Request) {
   const id = searchParams.get('id');
   if (!id) return NextResponse.json({ error: 'Falta el id' }, { status: 400 });
 
-  await deleteAddress(client, id);
-  return NextResponse.json({ ok: true });
+  try {
+    await deleteAddress(client, id);
+    return NextResponse.json({ ok: true });
+  } catch (error) {
+    return NextResponse.json({ error: (error as Error).message }, { status: 500 });
+  }
 }
