@@ -31,40 +31,23 @@ export interface CreateOrderInput {
 }
 
 export async function createOrder(client: SupabaseClient, input: CreateOrderInput): Promise<string> {
-  const totalClp = input.subtotalClp + input.shippingCostClp;
-
-  const { data: order, error: orderError } = await client
-    .from('orders')
-    .insert({
-      customer_name: input.customerName,
-      customer_email: input.customerEmail,
-      customer_phone: input.customerPhone,
-      delivery_method: input.deliveryMethod,
+  const { data, error } = await client.rpc('create_order', {
+    input: {
+      customerName: input.customerName,
+      customerEmail: input.customerEmail,
+      customerPhone: input.customerPhone,
+      deliveryMethod: input.deliveryMethod,
       region: input.region ?? null,
       address: input.address ?? null,
-      shipping_cost_clp: input.shippingCostClp,
-      payment_method: input.paymentMethod,
-      status: 'pendiente_pago',
-      subtotal_clp: input.subtotalClp,
-      total_clp: totalClp,
-    })
-    .select('id')
-    .single();
+      shippingCostClp: input.shippingCostClp,
+      paymentMethod: input.paymentMethod,
+      subtotalClp: input.subtotalClp,
+      items: input.items,
+    },
+  });
 
-  if (orderError) throw orderError;
-
-  const { error: itemsError } = await client.from('order_items').insert(
-    input.items.map((item) => ({
-      order_id: order.id,
-      product_id: item.productId,
-      quantity: item.quantity,
-      unit_price_clp: item.unitPriceClp,
-    }))
-  );
-
-  if (itemsError) throw itemsError;
-
-  return order.id as string;
+  if (error) throw error;
+  return data as string;
 }
 
 export interface CreateQuoteRequestInput {
@@ -78,23 +61,20 @@ export interface CreateQuoteRequestInput {
 }
 
 export async function createQuoteRequest(client: SupabaseClient, input: CreateQuoteRequestInput): Promise<string> {
-  const { data, error } = await client
-    .from('quote_requests')
-    .insert({
+  const { data, error } = await client.rpc('create_quote_request', {
+    input: {
       name: input.name,
       email: input.email,
       phone: input.phone,
       description: input.description,
       quantity: input.quantity,
-      budget_clp: input.budgetClp ?? null,
-      reference_image_url: input.referenceImageUrl ?? null,
-      status: 'nueva',
-    })
-    .select('id')
-    .single();
+      budgetClp: input.budgetClp ?? null,
+      referenceImageUrl: input.referenceImageUrl ?? null,
+    },
+  });
 
   if (error) throw error;
-  return data.id as string;
+  return data as string;
 }
 
 export interface Address {
@@ -169,4 +149,28 @@ export async function updateAddress(client: SupabaseClient, id: string, input: U
 export async function deleteAddress(client: SupabaseClient, id: string): Promise<void> {
   const { error } = await client.from('addresses').delete().eq('id', id);
   if (error) throw error;
+}
+
+export interface OrderSummary {
+  id: string;
+  createdAt: string;
+  status: string;
+  totalClp: number;
+}
+
+export async function fetchOrdersForUser(client: SupabaseClient, userId: string, email: string): Promise<OrderSummary[]> {
+  const { data, error } = await client
+    .from('orders')
+    .select('id, created_at, status, total_clp')
+    .or(`user_id.eq.${userId},customer_email.eq.${email}`)
+    .order('created_at', { ascending: false });
+
+  if (error) throw error;
+
+  return (data ?? []).map((row: any) => ({
+    id: row.id,
+    createdAt: row.created_at,
+    status: row.status,
+    totalClp: row.total_clp,
+  }));
 }
