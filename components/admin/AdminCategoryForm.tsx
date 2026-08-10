@@ -1,9 +1,11 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { categoryAdminSchema } from '@/lib/validation/category-admin-schema';
 
 export function AdminCategoryForm({ onSaved }: { onSaved: () => void }) {
+  const router = useRouter();
   const [form, setForm] = useState({ slug: '', name: '' });
   const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -29,6 +31,7 @@ export function AdminCategoryForm({ onSaved }: { onSaved: () => void }) {
 
     setForm({ slug: '', name: '' });
     onSaved();
+    router.refresh();
   }
 
   return (

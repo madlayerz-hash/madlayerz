@@ -3,6 +3,10 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { AdminOrderDetail } from './AdminOrderDetail';
 
+vi.mock('next/navigation', () => ({
+  useRouter: () => ({ refresh: vi.fn(), push: vi.fn() }),
+}));
+
 const order = {
   id: 'order-1',
   customerName: 'Pablo Toro',

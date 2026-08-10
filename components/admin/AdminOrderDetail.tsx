@@ -1,5 +1,7 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
+
 interface OrderDetail {
   id: string;
   customerName: string;
@@ -13,6 +15,8 @@ interface OrderDetail {
 const STATUSES = ['pendiente_pago', 'pagado', 'enviado', 'entregado', 'cancelado'];
 
 export function AdminOrderDetail({ order, onStatusChanged }: { order: OrderDetail; onStatusChanged: () => void }) {
+  const router = useRouter();
+
   async function handleStatusChange(e: React.ChangeEvent<HTMLSelectElement>) {
     await fetch(`/api/admin/orders/${order.id}`, {
       method: 'PATCH',
@@ -20,6 +24,7 @@ export function AdminOrderDetail({ order, onStatusChanged }: { order: OrderDetai
       body: JSON.stringify({ status: e.target.value }),
     });
     onStatusChanged();
+    router.refresh();
   }
 
   return (

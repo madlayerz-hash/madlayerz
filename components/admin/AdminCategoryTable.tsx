@@ -1,5 +1,7 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
+
 interface CategoryRow {
   id: string;
   slug: string;
@@ -7,6 +9,8 @@ interface CategoryRow {
 }
 
 export function AdminCategoryTable({ categories, onChange }: { categories: CategoryRow[]; onChange: () => void }) {
+  const router = useRouter();
+
   async function handleDelete(id: string) {
     const response = await fetch(`/api/admin/categories?id=${id}`, { method: 'DELETE' });
     if (!response.ok) {
@@ -15,6 +19,7 @@ export function AdminCategoryTable({ categories, onChange }: { categories: Categ
       return;
     }
     onChange();
+    router.refresh();
   }
 
   return (

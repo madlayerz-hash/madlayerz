@@ -1,5 +1,7 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
+
 interface ProductRow {
   id: string;
   name: string;
@@ -8,10 +10,13 @@ interface ProductRow {
 }
 
 export function AdminProductTable({ products, onChange }: { products: ProductRow[]; onChange: () => void }) {
+  const router = useRouter();
+
   async function handleDelete(id: string) {
     if (!confirm('¿Eliminar este producto? Esta acción no se puede deshacer.')) return;
     await fetch(`/api/admin/products?id=${id}`, { method: 'DELETE' });
     onChange();
+    router.refresh();
   }
 
   return (

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { productAdminSchema } from '@/lib/validation/product-admin-schema';
 import { createBrowserSupabaseClient } from '@/lib/supabase/browser-client';
 import { uploadProductImage } from '@/lib/supabase/storage';
@@ -11,6 +12,7 @@ interface CategoryOption {
 }
 
 export function AdminProductForm({ categories, onSaved }: { categories: CategoryOption[]; onSaved: () => void }) {
+  const router = useRouter();
   const [form, setForm] = useState({
     name: '',
     description: '',
@@ -60,6 +62,7 @@ export function AdminProductForm({ categories, onSaved }: { categories: Category
     setForm({ name: '', description: '', priceClp: '', categoryId: categories[0]?.id ?? '', featured: false });
     setFile(null);
     onSaved();
+    router.refresh();
   }
 
   return (

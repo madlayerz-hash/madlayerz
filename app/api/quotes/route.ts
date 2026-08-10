@@ -1,13 +1,13 @@
 import { NextResponse } from 'next/server';
 import { Resend } from 'resend';
-import { createSupabaseClient } from '@/lib/supabase/client';
+import { createServerSupabaseClient } from '@/lib/supabase/server-client';
 import { createQuoteRequest, type CreateQuoteRequestInput } from '@/lib/supabase/queries';
 
 export async function POST(request: Request) {
   const body = (await request.json()) as CreateQuoteRequestInput;
 
   try {
-    const id = await createQuoteRequest(createSupabaseClient(), body);
+    const id = await createQuoteRequest(await createServerSupabaseClient(), body);
 
     if (process.env.RESEND_API_KEY && process.env.QUOTE_NOTIFICATION_EMAIL) {
       const resend = new Resend(process.env.RESEND_API_KEY);
