@@ -3,8 +3,14 @@
 import { useState } from 'react';
 import { shippingInfoSchema, type ShippingInfoInput } from '@/lib/validation/checkout-schema';
 
-export function ShippingStep({ onContinue }: { onContinue: (data: ShippingInfoInput) => void }) {
-  const [form, setForm] = useState({ name: '', email: '', phone: '' });
+export function ShippingStep({
+  onContinue,
+  initialValues,
+}: {
+  onContinue: (data: ShippingInfoInput) => void;
+  initialValues?: { name: string; email: string };
+}) {
+  const [form, setForm] = useState({ name: initialValues?.name ?? '', email: initialValues?.email ?? '', phone: '' });
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   function handleSubmit(e: React.FormEvent) {

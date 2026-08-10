@@ -26,4 +26,22 @@ describe('DeliveryStep', () => {
 
     expect(screen.getByText('$0')).toBeInTheDocument();
   });
+
+  it('lets the user pick a saved address instead of typing one', async () => {
+    const user = userEvent.setup();
+    const onContinue = vi.fn();
+    const savedAddresses = [
+      { id: 'a1', userId: 'u1', label: 'Casa', region: 'valparaiso', address: 'Calle Falsa 456', isDefault: true },
+    ];
+
+    render(<DeliveryStep onContinue={onContinue} savedAddresses={savedAddresses} />);
+
+    await user.click(screen.getByLabelText('Despacho a domicilio'));
+    await user.click(screen.getByRole('button', { name: /usar esta dirección/i }));
+
+    expect(onContinue).toHaveBeenCalledWith(
+      { method: 'domicilio', region: 'valparaiso', address: 'Calle Falsa 456' },
+      4500
+    );
+  });
 });
