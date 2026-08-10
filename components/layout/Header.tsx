@@ -49,7 +49,14 @@ export function Header() {
         <Link href="/catalogo">Catálogo</Link>
         <Link href="/cotizacion">Cotización</Link>
         {role === 'admin' && <Link href="/admin/productos">Panel Admin</Link>}
-        {loggedIn ? <Link href="/cuenta">Mi cuenta</Link> : <Link href="/cuenta/login">Iniciar sesión</Link>}
+        {loggedIn ? (
+          <Link href="/cuenta">Mi cuenta</Link>
+        ) : (
+          <>
+            <Link href="/cuenta/login">Iniciar sesión</Link>
+            <Link href="/cuenta/registro">Crear cuenta</Link>
+          </>
+        )}
         <ThemeToggle />
         <button aria-label="Carrito" onClick={openDrawer} className="relative">
           🛒

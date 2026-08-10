@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { loginSchema } from '@/lib/validation/auth-schema';
 import { createBrowserSupabaseClient } from '@/lib/supabase/browser-client';
@@ -54,6 +55,9 @@ export function LoginForm() {
       <button type="submit" className="rounded-full bg-brand py-3 font-semibold text-white">
         Iniciar sesión
       </button>
+      <p className="text-center text-sm">
+        ¿No tienes cuenta? <Link href="/cuenta/registro" className="underline">Regístrate</Link>
+      </p>
     </form>
   );
 }

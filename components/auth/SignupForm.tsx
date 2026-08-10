@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { signupSchema } from '@/lib/validation/auth-schema';
 import { createBrowserSupabaseClient } from '@/lib/supabase/browser-client';
 
@@ -70,6 +71,9 @@ export function SignupForm() {
       <button type="submit" className="rounded-full bg-brand py-3 font-semibold text-white">
         Crear cuenta
       </button>
+      <p className="text-center text-sm">
+        ¿Ya tienes cuenta? <Link href="/cuenta/login" className="underline">Inicia sesión</Link>
+      </p>
     </form>
   );
 }
