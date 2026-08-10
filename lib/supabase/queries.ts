@@ -96,3 +96,77 @@ export async function createQuoteRequest(client: SupabaseClient, input: CreateQu
   if (error) throw error;
   return data.id as string;
 }
+
+export interface Address {
+  id: string;
+  userId: string;
+  label: string;
+  region: string;
+  address: string;
+  isDefault: boolean;
+}
+
+export async function fetchAddresses(client: SupabaseClient, userId: string): Promise<Address[]> {
+  const { data, error } = await client
+    .from('addresses')
+    .select('id, user_id, label, region, address, is_default')
+    .eq('user_id', userId)
+    .order('created_at', { ascending: false });
+
+  if (error) throw error;
+
+  return (data ?? []).map((row: any) => ({
+    id: row.id,
+    userId: row.user_id,
+    label: row.label,
+    region: row.region,
+    address: row.address,
+    isDefault: row.is_default,
+  }));
+}
+
+export interface CreateAddressInput {
+  userId: string;
+  label: string;
+  region: string;
+  address: string;
+  isDefault: boolean;
+}
+
+export async function createAddress(client: SupabaseClient, input: CreateAddressInput): Promise<string> {
+  const { data, error } = await client
+    .from('addresses')
+    .insert({
+      user_id: input.userId,
+      label: input.label,
+      region: input.region,
+      address: input.address,
+      is_default: input.isDefault,
+    })
+    .select('id')
+    .single();
+
+  if (error) throw error;
+  return data.id as string;
+}
+
+export interface UpdateAddressInput {
+  label: string;
+  region: string;
+  address: string;
+  isDefault: boolean;
+}
+
+export async function updateAddress(client: SupabaseClient, id: string, input: UpdateAddressInput): Promise<void> {
+  const { error } = await client
+    .from('addresses')
+    .update({ label: input.label, region: input.region, address: input.address, is_default: input.isDefault })
+    .eq('id', id);
+
+  if (error) throw error;
+}
+
+export async function deleteAddress(client: SupabaseClient, id: string): Promise<void> {
+  const { error } = await client.from('addresses').delete().eq('id', id);
+  if (error) throw error;
+}
