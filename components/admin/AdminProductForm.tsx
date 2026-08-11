@@ -11,7 +11,7 @@ interface CategoryOption {
   name: string;
 }
 
-export function AdminProductForm({ categories, onSaved }: { categories: CategoryOption[]; onSaved: () => void }) {
+export function AdminProductForm({ categories, onSaved }: { categories: CategoryOption[]; onSaved?: () => void }) {
   const router = useRouter();
   const [form, setForm] = useState({
     name: '',
@@ -61,7 +61,7 @@ export function AdminProductForm({ categories, onSaved }: { categories: Category
     setSubmitting(false);
     setForm({ name: '', description: '', priceClp: '', categoryId: categories[0]?.id ?? '', featured: false });
     setFile(null);
-    onSaved();
+    onSaved?.();
     router.refresh();
   }
 

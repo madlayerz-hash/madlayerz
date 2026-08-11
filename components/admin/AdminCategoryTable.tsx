@@ -8,7 +8,7 @@ interface CategoryRow {
   name: string;
 }
 
-export function AdminCategoryTable({ categories, onChange }: { categories: CategoryRow[]; onChange: () => void }) {
+export function AdminCategoryTable({ categories, onChange }: { categories: CategoryRow[]; onChange?: () => void }) {
   const router = useRouter();
 
   async function handleDelete(id: string) {
@@ -18,7 +18,7 @@ export function AdminCategoryTable({ categories, onChange }: { categories: Categ
       alert(body.error ?? 'No se pudo eliminar la categoría.');
       return;
     }
-    onChange();
+    onChange?.();
     router.refresh();
   }
 

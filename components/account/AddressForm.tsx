@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { addressSchema } from '@/lib/validation/address-schema';
 
 const REGIONS = [
@@ -12,9 +13,10 @@ const REGIONS = [
   { value: 'otra', label: 'Otra región' },
 ];
 
-export function AddressForm({ onSaved }: { onSaved: () => void }) {
+export function AddressForm({ onSaved }: { onSaved?: () => void }) {
   const [form, setForm] = useState({ label: '', region: 'metropolitana', address: '', isDefault: false });
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const router = useRouter();
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -42,7 +44,8 @@ export function AddressForm({ onSaved }: { onSaved: () => void }) {
     }
 
     setForm({ label: '', region: 'metropolitana', address: '', isDefault: false });
-    onSaved();
+    onSaved?.();
+    router.refresh();
   }
 
   return (

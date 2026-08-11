@@ -11,9 +11,9 @@ export default async function AdminCategoriasPage() {
       <h1 className="mb-6 text-2xl font-bold" style={{ color: 'var(--heading)' }}>
         Categorías
       </h1>
-      <AdminCategoryTable categories={categories ?? []} onChange={() => {}} />
+      <AdminCategoryTable categories={categories ?? []} />
       <div className="mt-6">
-        <AdminCategoryForm onSaved={() => {}} />
+        <AdminCategoryForm />
       </div>
     </div>
   );

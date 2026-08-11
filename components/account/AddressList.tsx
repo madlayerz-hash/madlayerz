@@ -1,5 +1,6 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
 import type { Address } from '@/lib/supabase/queries';
 
 const REGION_LABELS: Record<string, string> = {
@@ -11,7 +12,9 @@ const REGION_LABELS: Record<string, string> = {
   otra: 'Otra región',
 };
 
-export function AddressList({ addresses, onChange }: { addresses: Address[]; onChange: () => void }) {
+export function AddressList({ addresses, onChange }: { addresses: Address[]; onChange?: () => void }) {
+  const router = useRouter();
+
   async function handleDelete(id: string) {
     if (!confirm('¿Eliminar esta dirección?')) return;
 
@@ -20,7 +23,8 @@ export function AddressList({ addresses, onChange }: { addresses: Address[]; onC
       alert('No se pudo eliminar la dirección. Intenta nuevamente.');
       return;
     }
-    onChange();
+    onChange?.();
+    router.refresh();
   }
 
   if (addresses.length === 0) {

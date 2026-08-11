@@ -9,13 +9,13 @@ interface ProductRow {
   featured: boolean;
 }
 
-export function AdminProductTable({ products, onChange }: { products: ProductRow[]; onChange: () => void }) {
+export function AdminProductTable({ products, onChange }: { products: ProductRow[]; onChange?: () => void }) {
   const router = useRouter();
 
   async function handleDelete(id: string) {
     if (!confirm('¿Eliminar este producto? Esta acción no se puede deshacer.')) return;
     await fetch(`/api/admin/products?id=${id}`, { method: 'DELETE' });
-    onChange();
+    onChange?.();
     router.refresh();
   }
 

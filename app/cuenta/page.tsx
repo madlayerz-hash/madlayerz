@@ -37,9 +37,9 @@ export default async function CuentaPage() {
 
       <section>
         <h2 className="mb-4 text-xl font-bold">Mis direcciones</h2>
-        <AddressList addresses={addresses} onChange={() => {}} />
+        <AddressList addresses={addresses} />
         <div className="mt-4">
-          <AddressForm onSaved={() => {}} />
+          <AddressForm />
         </div>
       </section>
     </main>

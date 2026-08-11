@@ -14,9 +14,9 @@ export default async function AdminProductosPage() {
       <h1 className="mb-6 text-2xl font-bold" style={{ color: 'var(--heading)' }}>
         Productos
       </h1>
-      <AdminProductTable products={products ?? []} onChange={() => {}} />
+      <AdminProductTable products={products ?? []} />
       <div className="mt-6">
-        <AdminProductForm categories={categories ?? []} onSaved={() => {}} />
+        <AdminProductForm categories={categories ?? []} />
       </div>
     </div>
   );
