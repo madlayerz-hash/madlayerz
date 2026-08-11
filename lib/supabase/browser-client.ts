@@ -1,7 +1,11 @@
 import { createBrowserClient } from '@supabase/ssr';
 import type { SupabaseClient } from '@supabase/supabase-js';
 
+let cachedClient: SupabaseClient | null = null;
+
 export function createBrowserSupabaseClient(): SupabaseClient {
+  if (cachedClient) return cachedClient;
+
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
@@ -9,5 +13,6 @@ export function createBrowserSupabaseClient(): SupabaseClient {
     throw new Error('Missing NEXT_PUBLIC_SUPABASE_URL or NEXT_PUBLIC_SUPABASE_ANON_KEY');
   }
 
-  return createBrowserClient(url, anonKey);
+  cachedClient = createBrowserClient(url, anonKey);
+  return cachedClient;
 }
