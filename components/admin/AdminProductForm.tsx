@@ -30,7 +30,7 @@ export function AdminProductForm({ categories, onSaved }: { categories: Category
     const result = productAdminSchema.safeParse({
       name: form.name,
       description: form.description,
-      priceClp: Number(form.priceClp),
+      priceClp: Number(form.priceClp.replace(/[.,\s]/g, '')),
       categoryId: form.categoryId,
       featured: form.featured,
     });
@@ -80,7 +80,7 @@ export function AdminProductForm({ categories, onSaved }: { categories: Category
       </div>
       <div>
         <label htmlFor="priceClp">Precio (CLP)</label>
-        <input id="priceClp" type="number" value={form.priceClp} onChange={(e) => setForm({ ...form, priceClp: e.target.value })} className="w-full rounded-full bg-transparent px-4 py-2" />
+        <input id="priceClp" type="text" inputMode="numeric" placeholder="10000 o 10.000" value={form.priceClp} onChange={(e) => setForm({ ...form, priceClp: e.target.value })} className="w-full rounded-full bg-transparent px-4 py-2" />
         {errors.priceClp && <p className="text-sm text-red-500">{errors.priceClp}</p>}
       </div>
       <div>
