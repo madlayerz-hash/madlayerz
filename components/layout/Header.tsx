@@ -50,7 +50,18 @@ export function Header() {
         <Link href="/cotizacion">Cotización</Link>
         {role === 'admin' && <Link href="/admin/productos">Panel Admin</Link>}
         {loggedIn ? (
-          <Link href="/cuenta">Mi cuenta</Link>
+          <>
+            <Link href="/cuenta">Mi cuenta</Link>
+            <button
+              onClick={async () => {
+                const client = createBrowserSupabaseClient();
+                await client.auth.signOut();
+                window.location.href = '/';
+              }}
+            >
+              Cerrar sesión
+            </button>
+          </>
         ) : (
           <>
             <Link href="/cuenta/login">Iniciar sesión</Link>
