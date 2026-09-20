@@ -1,4 +1,12 @@
+import type { Metadata } from 'next';
 import { QuoteForm } from '@/components/quote/QuoteForm';
+
+export const metadata: Metadata = {
+  title: 'Cotización personalizada',
+  description:
+    'Cuéntanos tu idea y te enviamos una cotización a medida para tu pieza impresa en 3D. Diseños propios, regalos corporativos y series pequeñas.',
+  alternates: { canonical: '/cotizacion' },
+};
 
 export default function CotizacionPage() {
   return (

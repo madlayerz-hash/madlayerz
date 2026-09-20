@@ -1,9 +1,15 @@
+import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import { createServerSupabaseClient } from '@/lib/supabase/server-client';
 import { fetchOrdersForUser, fetchAddresses } from '@/lib/supabase/queries';
 import { OrderHistoryList } from '@/components/account/OrderHistoryList';
 import { AddressList } from '@/components/account/AddressList';
 import { AddressForm } from '@/components/account/AddressForm';
+
+export const metadata: Metadata = {
+  title: 'Mi cuenta',
+  robots: { index: false, follow: false },
+};
 
 export default async function CuentaPage() {
   const client = await createServerSupabaseClient();

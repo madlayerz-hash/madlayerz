@@ -3,7 +3,12 @@
 import { useState } from 'react';
 import type { ProductFilters } from '@/lib/catalog/types';
 
-const CATEGORIES = [
+export interface CategoryOption {
+  slug: string;
+  name: string;
+}
+
+const DEFAULT_CATEGORIES: CategoryOption[] = [
   { slug: '', name: 'Todas' },
   { slug: 'llaveros', name: 'Llaveros' },
   { slug: 'figuras-personajes', name: 'Figuras de Personajes' },
@@ -12,9 +17,21 @@ const CATEGORIES = [
   { slug: 'juguetes', name: 'Juguetes' },
 ];
 
-export function CatalogFilters({ onFilterChange }: { onFilterChange: (filters: ProductFilters) => void }) {
+export function CatalogFilters({
+  onFilterChange,
+  categories,
+  initialCategory = '',
+}: {
+  onFilterChange: (filters: ProductFilters) => void;
+  /** Comes from the database so a category created in the admin shows up here. */
+  categories?: CategoryOption[];
+  /** Preselected from the ?category= query parameter. */
+  initialCategory?: string;
+}) {
   const [search, setSearch] = useState('');
-  const [category, setCategory] = useState('');
+  const [category, setCategory] = useState(initialCategory);
+
+  const options = categories?.length ? [{ slug: '', name: 'Todas' }, ...categories] : DEFAULT_CATEGORIES;
 
   function emit(nextSearch: string, nextCategory: string) {
     onFilterChange({
@@ -24,34 +41,40 @@ export function CatalogFilters({ onFilterChange }: { onFilterChange: (filters: P
   }
 
   return (
-    <div className="glass-surface mb-6 flex flex-wrap gap-4 rounded-2xl p-4">
-      <input
-        placeholder="Buscar productos..."
-        value={search}
-        onChange={(e) => {
-          setSearch(e.target.value);
-          emit(e.target.value, category);
-        }}
-        className="flex-1 rounded-full bg-transparent px-4 py-2 outline-none"
-      />
-      <label className="flex items-center gap-2">
-        Categoría
+    <div className="glass-surface mb-6 flex flex-wrap items-end gap-4 rounded-2xl p-4">
+      <div className="flex-1 basis-48">
+        <label htmlFor="buscar">Buscar</label>
+        <input
+          id="buscar"
+          type="search"
+          placeholder="Buscar productos..."
+          value={search}
+          onChange={(e) => {
+            setSearch(e.target.value);
+            emit(e.target.value, category);
+          }}
+          className="w-full rounded-full bg-transparent px-4 py-2 outline-none"
+        />
+      </div>
+      <div>
+        <label htmlFor="categoria">Categoría</label>
         <select
+          id="categoria"
           aria-label="Categoría"
           value={category}
           onChange={(e) => {
             setCategory(e.target.value);
             emit(search, e.target.value);
           }}
-          className="rounded-full bg-transparent px-3 py-2"
+          className="w-full rounded-full bg-transparent px-3 py-2"
         >
-          {CATEGORIES.map((c) => (
+          {options.map((c) => (
             <option key={c.slug} value={c.slug}>
               {c.name}
             </option>
           ))}
         </select>
-      </label>
+      </div>
     </div>
   );
 }

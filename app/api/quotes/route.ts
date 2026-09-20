@@ -1,22 +1,33 @@
 import { NextResponse } from 'next/server';
-import { Resend } from 'resend';
 import { createServerSupabaseClient } from '@/lib/supabase/server-client';
 import { createQuoteRequest, type CreateQuoteRequestInput } from '@/lib/supabase/queries';
+import { quoteRequestSchema } from '@/lib/validation/quote-schema';
+import { NOTIFICATION_EMAIL, RESEND_FROM, sendEmailSafely } from '@/lib/email/resend-client';
 
 export async function POST(request: Request) {
-  const body = (await request.json()) as CreateQuoteRequestInput;
+  const parsed = quoteRequestSchema.safeParse(await request.json().catch(() => null));
+
+  if (!parsed.success) {
+    return NextResponse.json({ error: parsed.error.issues[0]?.message ?? 'Datos inválidos' }, { status: 400 });
+  }
+
+  const body = parsed.data as CreateQuoteRequestInput;
 
   try {
     const id = await createQuoteRequest(await createServerSupabaseClient(), body);
 
-    if (process.env.RESEND_API_KEY && process.env.QUOTE_NOTIFICATION_EMAIL) {
-      const resend = new Resend(process.env.RESEND_API_KEY);
-      await resend.emails.send({
-        from: 'MadLayerz <notificaciones@madlayerz.cl>',
-        to: process.env.QUOTE_NOTIFICATION_EMAIL,
-        subject: `Nueva cotización de ${body.name}`,
-        text: `${body.name} (${body.email}, ${body.phone}) pidió cotización:\n\n${body.description}\n\nCantidad: ${body.quantity}`,
-      });
+    if (NOTIFICATION_EMAIL) {
+      void sendEmailSafely('cotización', (resend) =>
+        resend.emails.send({
+          from: RESEND_FROM,
+          to: NOTIFICATION_EMAIL,
+          replyTo: body.email,
+          subject: `Nueva cotización de ${body.name}`,
+          text: `${body.name} (${body.email}, ${body.phone}) pidió cotización:\n\n${body.description}\n\nCantidad: ${body.quantity}${
+            body.budgetClp ? `\nPresupuesto: $${body.budgetClp.toLocaleString('es-CL')}` : ''
+          }\n\nVer en el panel: /admin/cotizaciones`,
+        })
+      );
     }
 
     return NextResponse.json({ id });

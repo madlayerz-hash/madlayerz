@@ -2,7 +2,12 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 import type { Product } from '@/lib/catalog/types';
 import { mapRowToProduct, type ProductRow } from './mappers';
 
-const PRODUCT_SELECT = 'id, slug, name, description, price_clp, image_url, featured, categories ( slug, name )';
+const PRODUCT_SELECT = `
+  id, slug, name, description, price_clp, image_url, featured,
+  material, dimensions_mm, weight_g, production_days, care_notes, images,
+  categories ( slug, name ),
+  product_variants ( name, color_hex, image_url, sort_order )
+`;
 
 export async function fetchProducts(client: SupabaseClient): Promise<Product[]> {
   const { data, error } = await client.from('products').select(PRODUCT_SELECT);
@@ -17,6 +22,18 @@ export async function fetchProductBySlug(client: SupabaseClient, slug: string): 
   return mapRowToProduct(data as unknown as ProductRow);
 }
 
+export interface CategoryRecord {
+  id: string;
+  slug: string;
+  name: string;
+}
+
+export async function fetchCategories(client: SupabaseClient): Promise<CategoryRecord[]> {
+  const { data, error } = await client.from('categories').select('id, slug, name').order('name');
+  if (error) throw error;
+  return (data ?? []) as CategoryRecord[];
+}
+
 export interface CreateOrderInput {
   customerName: string;
   customerEmail: string;
@@ -27,7 +44,7 @@ export interface CreateOrderInput {
   shippingCostClp: number;
   paymentMethod: 'flow' | 'mercadopago';
   subtotalClp: number;
-  items: { productId: string; quantity: number; unitPriceClp: number }[];
+  items: { productId: string; quantity: number; unitPriceClp: number; variantName?: string }[];
 }
 
 export async function createOrder(client: SupabaseClient, input: CreateOrderInput): Promise<string> {
@@ -162,7 +179,10 @@ export async function fetchOrdersForUser(client: SupabaseClient, userId: string,
   const { data, error } = await client
     .from('orders')
     .select('id, created_at, status, total_clp')
-    .or(`user_id.eq.${userId},customer_email.eq.${email}`)
+    // The value has to be quoted: an unescaped email with a comma, dot or
+    // parenthesis is parsed as extra PostgREST filter syntax and the query
+    // either errors or silently returns the wrong rows.
+    .or(`user_id.eq.${userId},customer_email.eq."${email.replace(/"/g, '')}"`)
     .order('created_at', { ascending: false });
 
   if (error) throw error;
@@ -173,4 +193,87 @@ export async function fetchOrdersForUser(client: SupabaseClient, userId: string,
     status: row.status,
     totalClp: row.total_clp,
   }));
+}
+
+export interface UpdateProductInput {
+  name: string;
+  description: string;
+  priceClp: number;
+  categoryId: string;
+  featured: boolean;
+  imageUrl?: string;
+}
+
+export async function updateProduct(client: SupabaseClient, id: string, input: UpdateProductInput): Promise<void> {
+  const patch: Record<string, unknown> = {
+    name: input.name,
+    description: input.description,
+    price_clp: input.priceClp,
+    category_id: input.categoryId,
+    featured: input.featured,
+  };
+
+  // Only overwrite the image when a new one was actually uploaded.
+  if (input.imageUrl) patch.image_url = input.imageUrl;
+
+  const { error } = await client.from('products').update(patch).eq('id', id);
+  if (error) throw error;
+}
+
+export interface QuoteRequestRecord {
+  id: string;
+  createdAt: string;
+  name: string;
+  email: string;
+  phone: string;
+  description: string;
+  quantity: number;
+  budgetClp: number | null;
+  status: string;
+}
+
+export async function fetchQuoteRequests(client: SupabaseClient): Promise<QuoteRequestRecord[]> {
+  const { data, error } = await client
+    .from('quote_requests')
+    .select('id, created_at, name, email, phone, description, quantity, budget_clp, status')
+    .order('created_at', { ascending: false });
+
+  if (error) throw error;
+
+  return (data ?? []).map((row: {
+    id: string;
+    created_at: string;
+    name: string;
+    email: string;
+    phone: string;
+    description: string;
+    quantity: number;
+    budget_clp: number | null;
+    status: string;
+  }) => ({
+    id: row.id,
+    createdAt: row.created_at,
+    name: row.name,
+    email: row.email,
+    phone: row.phone,
+    description: row.description,
+    quantity: row.quantity,
+    budgetClp: row.budget_clp,
+    status: row.status,
+  }));
+}
+
+export async function updateQuoteStatus(client: SupabaseClient, id: string, status: string): Promise<void> {
+  const { error } = await client.from('quote_requests').update({ status }).eq('id', id);
+  if (error) throw error;
+}
+
+/** Product names for an order confirmation email, keyed by product id. */
+export async function fetchProductNames(client: SupabaseClient, ids: string[]): Promise<Map<string, string>> {
+  if (ids.length === 0) return new Map();
+
+  const { data, error } = await client.from('products').select('id, name').in('id', ids);
+  if (error) throw error;
+
+  return new Map((data ?? []).map((row: { id: string; name: string }) => [row.id, row.name]));
 }

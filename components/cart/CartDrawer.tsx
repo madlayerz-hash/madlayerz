@@ -30,7 +30,7 @@ export function CartDrawer() {
           <>
             <div className="flex-1 overflow-y-auto">
               {items.map((item) => (
-                <CartItemRow key={item.productId} item={item} />
+                <CartItemRow key={`${item.productId}-${item.variantName ?? ''}`} item={item} />
               ))}
             </div>
             <div className="mt-4 border-t border-white/10 pt-4">

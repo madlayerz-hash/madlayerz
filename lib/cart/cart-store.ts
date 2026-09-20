@@ -8,14 +8,24 @@ export interface CartItem {
   unitPriceClp: number;
   imageUrl: string;
   quantity: number;
+  /** Color elegido en la ficha. Ausente = producto de un solo color. */
+  variantName?: string;
+}
+
+/**
+ * Una línea del carrito es un producto EN UN COLOR: el mismo busto en negro y
+ * en verde son dos líneas, no una de cantidad 2.
+ */
+function sameLine(item: CartItem, productId: string, variantName?: string): boolean {
+  return item.productId === productId && (item.variantName ?? null) === (variantName ?? null);
 }
 
 interface CartState {
   items: CartItem[];
   isDrawerOpen: boolean;
   addItem: (item: Omit<CartItem, 'quantity'>, quantity?: number) => void;
-  removeItem: (productId: string) => void;
-  updateQuantity: (productId: string, quantity: number) => void;
+  removeItem: (productId: string, variantName?: string) => void;
+  updateQuantity: (productId: string, quantity: number, variantName?: string) => void;
   clear: () => void;
   subtotalClp: () => number;
   openDrawer: () => void;
@@ -29,27 +39,27 @@ export const useCartStore = create<CartState>()(
       isDrawerOpen: false,
       addItem: (item, quantity = 1) => {
         set((state) => {
-          const existing = state.items.find((i) => i.productId === item.productId);
+          const existing = state.items.find((i) => sameLine(i, item.productId, item.variantName));
           if (existing) {
             return {
               items: state.items.map((i) =>
-                i.productId === item.productId ? { ...i, quantity: i.quantity + quantity } : i
+                sameLine(i, item.productId, item.variantName) ? { ...i, quantity: i.quantity + quantity } : i
               ),
             };
           }
           return { items: [...state.items, { ...item, quantity }] };
         });
       },
-      removeItem: (productId) => {
-        set((state) => ({ items: state.items.filter((i) => i.productId !== productId) }));
+      removeItem: (productId, variantName) => {
+        set((state) => ({ items: state.items.filter((i) => !sameLine(i, productId, variantName)) }));
       },
-      updateQuantity: (productId, quantity) => {
+      updateQuantity: (productId, quantity, variantName) => {
         if (quantity <= 0) {
-          set((state) => ({ items: state.items.filter((i) => i.productId !== productId) }));
+          set((state) => ({ items: state.items.filter((i) => !sameLine(i, productId, variantName)) }));
           return;
         }
         set((state) => ({
-          items: state.items.map((i) => (i.productId === productId ? { ...i, quantity } : i)),
+          items: state.items.map((i) => (sameLine(i, productId, variantName) ? { ...i, quantity } : i)),
         }));
       },
       clear: () => set({ items: [] }),

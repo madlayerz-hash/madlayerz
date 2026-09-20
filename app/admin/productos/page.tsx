@@ -1,11 +1,14 @@
 import { createServerSupabaseClient } from '@/lib/supabase/server-client';
-import { AdminProductForm } from '@/components/admin/AdminProductForm';
-import { AdminProductTable } from '@/components/admin/AdminProductTable';
+import { AdminProductsManager } from '@/components/admin/AdminProductsManager';
+import type { EditableProduct } from '@/components/admin/AdminProductForm';
+
+export const dynamic = 'force-dynamic';
 
 export default async function AdminProductosPage() {
   const client = await createServerSupabaseClient();
   const [{ data: products }, { data: categories }] = await Promise.all([
-    client.from('products').select('id, name, price_clp, featured').order('name'),
+    // description / category_id / slug are needed so a row can be edited in place.
+    client.from('products').select('id, slug, name, description, price_clp, category_id, featured').order('name'),
     client.from('categories').select('id, name').order('name'),
   ]);
 
@@ -14,10 +17,10 @@ export default async function AdminProductosPage() {
       <h1 className="mb-6 text-2xl font-bold" style={{ color: 'var(--heading)' }}>
         Productos
       </h1>
-      <AdminProductTable products={products ?? []} />
-      <div className="mt-6">
-        <AdminProductForm categories={categories ?? []} />
-      </div>
+      <AdminProductsManager
+        products={(products ?? []) as EditableProduct[]}
+        categories={categories ?? []}
+      />
     </div>
   );
 }

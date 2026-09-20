@@ -59,7 +59,21 @@ describe('fetchOrdersForUser', () => {
     const orders = await fetchOrdersForUser(client, 'u1', 'pablo@example.com');
 
     expect(from).toHaveBeenCalledWith('orders');
-    expect(or).toHaveBeenCalledWith('user_id.eq.u1,customer_email.eq.pablo@example.com');
+    expect(or).toHaveBeenCalledWith('user_id.eq.u1,customer_email.eq."pablo@example.com"');
     expect(orders).toEqual([{ id: 'o1', createdAt: '2026-01-01', status: 'pendiente_pago', totalClp: 3990 }]);
+  });
+});
+
+describe('fetchOrdersForUser filter escaping', () => {
+  it('quotes the email so PostgREST does not read its punctuation as filter syntax', async () => {
+    const order = vi.fn(async () => ({ data: [], error: null }));
+    const or = vi.fn(() => ({ order }));
+    const select = vi.fn(() => ({ or }));
+    const from = vi.fn(() => ({ select }));
+    const client = { from } as unknown as SupabaseClient;
+
+    await fetchOrdersForUser(client, 'u1', 'a,b(c)@example.com');
+
+    expect(or).toHaveBeenCalledWith('user_id.eq.u1,customer_email.eq."a,b(c)@example.com"');
   });
 });
