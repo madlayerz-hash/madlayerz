@@ -6,6 +6,7 @@ import { useCartStore } from '@/lib/cart/cart-store';
 import { createBrowserSupabaseClient } from '@/lib/supabase/browser-client';
 import type { Role } from '@/lib/auth/types';
 import { ThemeToggle } from './ThemeToggle';
+import { Logo } from '@/components/brand/Logo';
 
 export function Header() {
   const openDrawer = useCartStore((state) => state.openDrawer);
@@ -50,7 +51,12 @@ export function Header() {
 
   return (
     <header className="glass-surface sticky top-0 z-40 flex flex-wrap items-center justify-between gap-x-4 gap-y-3 px-4 py-3 sm:px-6 sm:py-4">
-      <Link href="/" className="text-xl font-extrabold" style={{ color: 'var(--heading)' }}>
+      <Link
+        href="/"
+        className="ml-brand flex items-center gap-2 text-xl font-extrabold"
+        style={{ color: 'var(--heading)' }}
+      >
+        <Logo variant="mark" className="h-8 w-8 shrink-0" />
         MadLayerz
       </Link>
 

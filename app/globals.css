@@ -12,6 +12,7 @@
   /* Contrast-safe accent for text on a light background (AA on white). */
   --accent-text: #15803d;
   --field-border: rgba(20, 83, 45, 0.25);
+  --logo-glow: #22c55e;
 }
 
 .dark {
@@ -23,6 +24,8 @@
   --accent: #4ade80;
   --accent-text: #4ade80;
   --field-border: rgba(74, 222, 128, 0.3);
+  /* En oscuro el logo ya es verde claro: el brillo tiene que ser casi blanco para notarse. */
+  --logo-glow: #eafff0;
 }
 
 body {
@@ -95,5 +98,114 @@ label {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+  }
+}
+
+/* ===================================================================
+   Logo animado — cabezal de impresora sobre una pieza impresa por capas
+   =================================================================== */
+
+.ml-logo {
+  fill: currentColor;
+  overflow: visible;
+}
+
+.ml-logo__glow {
+  fill: var(--logo-glow);
+  opacity: 0;
+}
+
+/* --- Hero: entrada (una vez) ------------------------------------------ */
+/* 1. baja el cabezal · 2. la pieza se imprime capa por capa · 3. la punta se
+   enciende. Después queda el ciclo de 5 s (abajo). */
+.ml-logo--hero .ml-logo__head {
+  animation:
+    ml-head-drop 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) both,
+    ml-head-extrude 5s ease-in-out 2.4s infinite;
+}
+
+.ml-logo--hero .ml-logo__print {
+  animation: ml-print 1.3s steps(9, end) 0.45s both;
+}
+
+.ml-logo--hero .ml-logo__tip {
+  animation:
+    ml-tip-flash 0.9s ease-out 1.75s both,
+    ml-tip-pulse 5s ease-in-out 2.4s infinite;
+}
+
+/* --- Hero: ciclo en reposo ------------------------------------------------
+   La boquilla baja un poco (extruye), la punta brilla y una franja de luz sube
+   recorriendo las capas. Dura 5 s y la mayor parte del tiempo está quieto. */
+.ml-logo--hero .ml-logo__scan {
+  animation: ml-scan 5s cubic-bezier(0.45, 0, 0.55, 1) 2.4s infinite;
+}
+
+.ml-logo--hero .ml-logo__glow {
+  animation: ml-scan-fade 5s linear 2.4s infinite;
+}
+
+/* --- Marca del header: se reimprime al pasar el mouse -------------------- */
+.ml-brand:hover .ml-logo--mark .ml-logo__print,
+.ml-brand:focus-visible .ml-logo--mark .ml-logo__print {
+  animation: ml-print 0.7s steps(9, end) both;
+}
+
+.ml-brand:hover .ml-logo--mark .ml-logo__head,
+.ml-brand:focus-visible .ml-logo--mark .ml-logo__head {
+  animation: ml-head-extrude-once 0.7s ease-in-out both;
+}
+
+.ml-brand:hover .ml-logo--mark .ml-logo__tip,
+.ml-brand:focus-visible .ml-logo--mark .ml-logo__tip {
+  animation: ml-tip-flash 0.6s ease-out 0.55s both;
+}
+
+@keyframes ml-head-drop {
+  from { transform: translateY(-90px); opacity: 0; }
+  to   { transform: translateY(0);     opacity: 1; }
+}
+
+/* Recorre toda la altura de la pieza (≈ 500 unidades) en 9 pasos = 9 capas. */
+@keyframes ml-print {
+  from { transform: translateY(500px); }
+  to   { transform: translateY(0); }
+}
+
+@keyframes ml-tip-flash {
+  from { fill: var(--logo-glow); }
+  to   { fill: currentColor; }
+}
+
+@keyframes ml-head-extrude {
+  0%, 9%, 100% { transform: translateY(0); }
+  4%           { transform: translateY(12px); }
+}
+
+@keyframes ml-head-extrude-once {
+  0%, 100% { transform: translateY(0); }
+  40%      { transform: translateY(14px); }
+}
+
+@keyframes ml-tip-pulse {
+  0%, 18%, 100% { fill: currentColor; }
+  4%            { fill: var(--logo-glow); }
+}
+
+@keyframes ml-scan {
+  0%, 10%   { transform: translateY(0); }
+  45%, 100% { transform: translateY(-520px); }
+}
+
+@keyframes ml-scan-fade {
+  0%, 10%   { opacity: 0; }
+  14%, 40%  { opacity: 0.9; }
+  45%, 100% { opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ml-logo,
+  .ml-logo * {
+    animation: none !important;
   }
 }
