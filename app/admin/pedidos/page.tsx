@@ -3,6 +3,17 @@ import { AdminOrderTable } from '@/components/admin/AdminOrderTable';
 
 export const dynamic = 'force-dynamic';
 
+interface OrderRow {
+  id: string;
+  customerName: string;
+  customerEmail: string;
+  status: string;
+  totalClp: number;
+  region: string | null;
+  address: string | null;
+  createdAt: string;
+}
+
 export default async function AdminPedidosPage() {
   const client = await createServerSupabaseClient();
   const { data: orders } = await client
@@ -10,7 +21,7 @@ export default async function AdminPedidosPage() {
     .select('id, customer_name, customer_email, status, total_clp, region, address, created_at')
     .order('created_at', { ascending: false });
 
-  const rows = (orders ?? []).map((o: {
+  const rows: OrderRow[] = (orders ?? []).map((o: {
     id: string;
     customer_name: string;
     customer_email: string;

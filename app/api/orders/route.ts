@@ -2,7 +2,12 @@ import { NextResponse } from 'next/server';
 import { createServerSupabaseClient } from '@/lib/supabase/server-client';
 import { createOrder } from '@/lib/supabase/queries';
 import { orderRequestSchema } from '@/lib/validation/order-schema';
-import { priceOrder, UnknownProductError, UnknownVariantError } from '@/lib/orders/price-order';
+import {
+  priceOrder,
+  UnknownProductError,
+  UnknownVariantError,
+  type CatalogEntry,
+} from '@/lib/orders/price-order';
 import { calculateShippingCost, type Region } from '@/lib/shipping/shipping-cost';
 import { buildOrderConfirmationEmail } from '@/lib/email/order-confirmation';
 import { NOTIFICATION_EMAIL, RESEND_FROM, sendEmailSafely } from '@/lib/email/resend-client';
@@ -26,20 +31,24 @@ export async function POST(request: Request) {
 
     if (error) throw error;
 
-    const catalog = new Map(
-      (rows ?? []).map((row: {
-        id: string;
-        name: string;
-        price_clp: number;
-        product_variants?: { name: string }[] | null;
-      }) => [
-        row.id,
-        {
-          name: row.name,
-          priceClp: row.price_clp,
-          variantNames: (row.product_variants ?? []).map((v) => v.name),
-        },
-      ])
+    // Tipos explícitos: sin ellos el Map depende de que TypeScript infiera una
+    // tupla a partir del resultado de Supabase, y eso no es confiable.
+    const catalog = new Map<string, CatalogEntry>(
+      (rows ?? []).map(
+        (row: {
+          id: string;
+          name: string;
+          price_clp: number;
+          product_variants?: { name: string }[] | null;
+        }): [string, CatalogEntry] => [
+          row.id,
+          {
+            name: row.name,
+            priceClp: row.price_clp,
+            variantNames: (row.product_variants ?? []).map((v) => v.name),
+          },
+        ]
+      )
     );
 
     const { items, subtotalClp } = priceOrder(input.items, catalog);
@@ -127,11 +136,12 @@ async function sendOrderEmails({
   );
 
   // Y un aviso para quien tiene que imprimir la pieza.
-  if (NOTIFICATION_EMAIL) {
+  const notifyTo = NOTIFICATION_EMAIL;
+  if (notifyTo) {
     await sendEmailSafely('aviso interno de pedido', (resend) =>
       resend.emails.send({
         from: RESEND_FROM,
-        to: NOTIFICATION_EMAIL,
+        to: notifyTo,
         replyTo: input.customerEmail,
         subject: `Nuevo pedido #${orderId.slice(0, 8).toUpperCase()} — ${input.customerName}`,
         text: `${input.customerName} (${input.customerEmail}, ${input.customerPhone})\n\n${email.text}`,

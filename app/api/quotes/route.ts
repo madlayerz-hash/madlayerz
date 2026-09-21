@@ -16,11 +16,12 @@ export async function POST(request: Request) {
   try {
     const id = await createQuoteRequest(await createServerSupabaseClient(), body);
 
-    if (NOTIFICATION_EMAIL) {
+    const notifyTo = NOTIFICATION_EMAIL;
+    if (notifyTo) {
       void sendEmailSafely('cotización', (resend) =>
         resend.emails.send({
           from: RESEND_FROM,
-          to: NOTIFICATION_EMAIL,
+          to: notifyTo,
           replyTo: body.email,
           subject: `Nueva cotización de ${body.name}`,
           text: `${body.name} (${body.email}, ${body.phone}) pidió cotización:\n\n${body.description}\n\nCantidad: ${body.quantity}${
