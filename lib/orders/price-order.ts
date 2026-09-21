@@ -60,7 +60,9 @@ export function priceOrder(requested: RequestedItem[], catalog: Map<string, Cata
 
   const items: PricedItem[] = [];
 
-  for (const line of merged.values()) {
+  // Array.from: el proyecto compila a ES5 (sin `target` en tsconfig) y ahí
+  // un iterador de Map no se puede recorrer directo con for...of.
+  for (const line of Array.from(merged.values())) {
     const entry = catalog.get(line.productId);
     if (!entry) throw new UnknownProductError(line.productId);
 
