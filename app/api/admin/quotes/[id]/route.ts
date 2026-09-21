@@ -3,7 +3,7 @@ import { createServerSupabaseClient } from '@/lib/supabase/server-client';
 import { requireAdmin } from '@/lib/auth/require-admin';
 import { updateQuoteStatus } from '@/lib/supabase/queries';
 
-export const QUOTE_STATUSES = ['nueva', 'en_proceso', 'cotizada', 'aceptada', 'cerrada'] as const;
+const QUOTE_STATUSES = ['nueva', 'en_proceso', 'cotizada', 'aceptada', 'cerrada'] as const;
 
 export async function PATCH(request: Request, { params }: { params: { id: string } }) {
   await requireAdmin();
