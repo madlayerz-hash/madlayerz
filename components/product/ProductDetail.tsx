@@ -11,7 +11,7 @@ export function ProductDetail({ product }: { product: Product }) {
   const addItem = useCartStore((state) => state.addItem);
   const openDrawer = useCartStore((state) => state.openDrawer);
 
-  const variants = product.variants ?? [];
+  const variants = useMemo(() => product.variants ?? [], [product.variants]);
   const [variantName, setVariantName] = useState<string | undefined>(variants[0]?.name);
   const [activeImage, setActiveImage] = useState<string | null>(null);
 

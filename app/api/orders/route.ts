@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createServerSupabaseClient } from '@/lib/supabase/server-client';
-import { createOrder, fetchProductNames } from '@/lib/supabase/queries';
+import { createOrder } from '@/lib/supabase/queries';
 import { orderRequestSchema } from '@/lib/validation/order-schema';
 import { priceOrder, UnknownProductError, UnknownVariantError } from '@/lib/orders/price-order';
 import { calculateShippingCost, type Region } from '@/lib/shipping/shipping-cost';
