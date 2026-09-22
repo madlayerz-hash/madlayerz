@@ -28,6 +28,9 @@ export default function CheckoutPage() {
   const [initialValues, setInitialValues] = useState<{ name: string; email: string } | undefined>();
   const [savedAddresses, setSavedAddresses] = useState<Address[]>([]);
   const [submitting, setSubmitting] = useState(false);
+  // Si el pedido ya se registró y lo que falló fue Mercado Pago, el reintento
+  // reutiliza ese pedido en vez de crear uno duplicado.
+  const [placedOrder, setPlacedOrder] = useState<{ id: string; totalClp: number } | null>(null);
   const [error, setError] = useState('');
   const [mounted, setMounted] = useState(false);
 
@@ -64,39 +67,68 @@ export default function CheckoutPage() {
 
     setSubmitting(true);
     setError('');
+    let redirecting = false;
 
     try {
-      const response = await fetch('/api/orders', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          customerName: shipping.name,
-          customerEmail: shipping.email,
-          customerPhone: shipping.phone,
-          deliveryMethod: delivery.data.method,
-          region: delivery.data.method === 'domicilio' ? delivery.data.region : undefined,
-          address: delivery.data.method === 'domicilio' ? delivery.data.address : undefined,
-          paymentMethod,
-          items: items.map((i) => ({ productId: i.productId, quantity: i.quantity })),
-        }),
-      });
+      let current = placedOrder;
 
-      const result = await response.json().catch(() => ({}));
+      if (!current) {
+        const response = await fetch('/api/orders', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            customerName: shipping.name,
+            customerEmail: shipping.email,
+            customerPhone: shipping.phone,
+            deliveryMethod: delivery.data.method,
+            region: delivery.data.method === 'domicilio' ? delivery.data.region : undefined,
+            address: delivery.data.method === 'domicilio' ? delivery.data.address : undefined,
+            paymentMethod,
+            items: items.map((i) => ({ productId: i.productId, quantity: i.quantity, variantName: i.variantName })),
+          }),
+        });
 
-      if (!response.ok || !result.orderId) {
-        // The cart is deliberately NOT cleared here: the customer keeps what
-        // they picked and can retry.
-        setError(result.error ?? 'No pudimos registrar tu pedido. Inténtalo de nuevo.');
+        const result = await response.json().catch(() => ({}));
+
+        if (!response.ok || !result.orderId) {
+          // The cart is deliberately NOT cleared here: the customer keeps what
+          // they picked and can retry.
+          setError(result.error ?? 'No pudimos registrar tu pedido. Inténtalo de nuevo.');
+          return;
+        }
+
+        current = { id: result.orderId, totalClp: result.totalClp ?? subtotalClp + delivery.cost };
+        setPlacedOrder(current);
+      }
+
+      if (paymentMethod === 'mercadopago') {
+        const response = await fetch('/api/payments/mercadopago/create', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ orderId: current.id }),
+        });
+        const result = await response.json().catch(() => ({}));
+
+        if (!response.ok || !result.url) {
+          setError(result.error ?? 'No pudimos conectar con Mercado Pago. Inténtalo de nuevo.');
+          return;
+        }
+
+        // El carrito NO se vacía aquí: se vacía en /checkout/resultado recién
+        // cuando el pago está confirmado.
+        redirecting = true;
+        window.location.href = result.url;
         return;
       }
 
-      setOrder({ id: result.orderId, totalClp: result.totalClp ?? subtotalClp + delivery.cost });
+      setOrder(current);
       clear();
       setStep('done');
     } catch {
       setError('No pudimos conectarnos. Revisa tu conexión e inténtalo otra vez.');
     } finally {
-      setSubmitting(false);
+      // Mientras el navegador sale hacia Mercado Pago el botón queda bloqueado.
+      if (!redirecting) setSubmitting(false);
     }
   }
 

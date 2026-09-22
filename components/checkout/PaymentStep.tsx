@@ -15,7 +15,7 @@ export function PaymentStep({
   submitting?: boolean;
   error?: string;
 }) {
-  const [method, setMethod] = useState<PaymentMethodInput>('flow');
+  const [method, setMethod] = useState<PaymentMethodInput>('mercadopago');
 
   return (
     <div className="glass-card flex flex-col gap-4 p-6">
@@ -27,22 +27,38 @@ export function PaymentStep({
         </p>
       )}
 
-      <p className="text-sm opacity-80">
-        El pago aún no se procesa en línea — tu pedido queda como &quot;pendiente de pago&quot; y te
-        contactamos para coordinar el cobro.
-      </p>
-
       <fieldset className="flex flex-col gap-2">
         <legend className="sr-only">Método de pago</legend>
-        <label className="flex items-center gap-2">
-          <input type="radio" name="payment" checked={method === 'flow'} onChange={() => setMethod('flow')} />
-          Flow
+
+        <label className="flex items-start gap-3 rounded-2xl border border-current/20 p-3">
+          <input
+            type="radio"
+            name="payment"
+            className="mt-1"
+            checked={method === 'mercadopago'}
+            onChange={() => setMethod('mercadopago')}
+          />
+          <span>
+            <span className="block font-semibold">Mercado Pago</span>
+            <span className="block text-sm opacity-75">
+              Tarjeta de crédito, débito o saldo en Mercado Pago.
+            </span>
+          </span>
         </label>
-        <label className="flex items-center gap-2">
-          <input type="radio" name="payment" checked={method === 'mercadopago'} onChange={() => setMethod('mercadopago')} />
-          Mercado Pago
+
+        <label className="flex items-start gap-3 rounded-2xl border border-current/10 p-3 opacity-50">
+          <input type="radio" name="payment" className="mt-1" disabled checked={false} onChange={() => {}} />
+          <span>
+            <span className="block font-semibold">Flow</span>
+            <span className="block text-sm">Próximamente</span>
+          </span>
         </label>
       </fieldset>
+
+      <p className="text-sm opacity-75">
+        Te llevaremos a Mercado Pago para pagar de forma segura. Al terminar vuelves aquí y tu pedido
+        queda confirmado.
+      </p>
 
       {error && <p className="text-sm text-red-500">{error}</p>}
 
@@ -51,7 +67,7 @@ export function PaymentStep({
         disabled={submitting}
         className="rounded-full bg-brand py-3 font-semibold text-white disabled:opacity-50"
       >
-        {submitting ? 'Enviando pedido...' : 'Confirmar pedido'}
+        {submitting ? 'Conectando con Mercado Pago...' : 'Pagar con Mercado Pago'}
       </button>
     </div>
   );
