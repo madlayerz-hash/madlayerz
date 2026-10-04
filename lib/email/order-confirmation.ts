@@ -22,6 +22,12 @@ export interface OrderEmailInput {
   deliveryMethod: 'domicilio' | 'retiro';
   region?: string | null;
   address?: string | null;
+  /**
+   * `true` cuando el pago ya está acreditado. Cambia el asunto y el cierre: un
+   * correo que dice «pendiente de pago» después de cobrar confunde y genera
+   * consultas al soporte.
+   */
+  paid?: boolean;
 }
 
 export interface BuiltEmail {
@@ -52,12 +58,20 @@ export function buildOrderConfirmationEmail(input: OrderEmailInput): BuiltEmail 
       ? 'Retiro coordinado (te escribimos para acordar día y hora).'
       : `Envío a domicilio: ${[input.address, input.region].filter(Boolean).join(', ')}`;
 
+  const closing = input.paid
+    ? 'Recibimos tu pago. Ya estamos preparando tu pedido y te avisamos cuando esté listo.'
+    : 'Tu pedido queda como pendiente de pago. Te contactamos por email o WhatsApp para coordinar el cobro y la entrega.';
+
+  const heading = input.paid
+    ? `¡Listo, ${input.customerName}! Recibimos tu pago.`
+    : `¡Gracias por tu pedido, ${input.customerName}!`;
+
   const lines = input.items.map(
     (item) => `${item.quantity} × ${lineName(item)} — ${formatClp(item.unitPriceClp * item.quantity)}`
   );
 
   const text = [
-    `¡Gracias por tu pedido, ${input.customerName}!`,
+    heading,
     '',
     `Pedido #${shortId}`,
     '',
@@ -69,7 +83,7 @@ export function buildOrderConfirmationEmail(input: OrderEmailInput): BuiltEmail 
     '',
     deliveryLine,
     '',
-    'Tu pedido queda como pendiente de pago. Te contactamos por email o WhatsApp para coordinar el cobro y la entrega.',
+    closing,
     '',
     `${SITE_NAME} — ${SITE_URL}`,
   ].join('\n');
@@ -77,7 +91,7 @@ export function buildOrderConfirmationEmail(input: OrderEmailInput): BuiltEmail 
   const html = `<!doctype html>
 <html lang="es"><body style="margin:0;padding:24px;background:#f6f7f6;font-family:system-ui,-apple-system,'Segoe UI',sans-serif;color:#1f2937">
   <div style="max-width:560px;margin:0 auto;background:#fff;border-radius:16px;padding:28px">
-    <h1 style="margin:0 0 4px;font-size:20px;color:#14532d">¡Gracias por tu pedido, ${escapeHtml(input.customerName)}!</h1>
+    <h1 style="margin:0 0 4px;font-size:20px;color:#14532d">${escapeHtml(heading)}</h1>
     <p style="margin:0 0 20px;color:#4b5563">Pedido <strong>#${escapeHtml(shortId)}</strong></p>
     <table style="width:100%;border-collapse:collapse;font-size:14px">
       ${input.items
@@ -93,10 +107,14 @@ export function buildOrderConfirmationEmail(input: OrderEmailInput): BuiltEmail 
       <tr><td style="padding:8px 0;border-top:2px solid #14532d;font-weight:700">Total</td><td style="padding:8px 0;border-top:2px solid #14532d;text-align:right;font-weight:700">${formatClp(totalClp)}</td></tr>
     </table>
     <p style="margin:20px 0 0;font-size:14px;color:#4b5563">${escapeHtml(deliveryLine)}</p>
-    <p style="margin:16px 0 0;font-size:14px;color:#4b5563">Tu pedido queda como <strong>pendiente de pago</strong>. Te contactamos por email o WhatsApp para coordinar el cobro y la entrega.</p>
+    <p style="margin:16px 0 0;font-size:14px;color:#4b5563">${escapeHtml(closing)}</p>
     <p style="margin:24px 0 0;font-size:13px;color:#6b7280"><a href="${SITE_URL}" style="color:#15803d">${SITE_NAME}</a></p>
   </div>
 </body></html>`;
 
-  return { subject: `Tu pedido #${shortId} en ${SITE_NAME}`, text, html };
+  const subject = input.paid
+    ? `Pago confirmado — pedido #${shortId} en ${SITE_NAME}`
+    : `Tu pedido #${shortId} en ${SITE_NAME}`;
+
+  return { subject, text, html };
 }

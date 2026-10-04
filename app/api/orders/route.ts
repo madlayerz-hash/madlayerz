@@ -9,8 +9,6 @@ import {
   type CatalogEntry,
 } from '@/lib/orders/price-order';
 import { calculateShippingCost, type Region } from '@/lib/shipping/shipping-cost';
-import { buildOrderConfirmationEmail } from '@/lib/email/order-confirmation';
-import { NOTIFICATION_EMAIL, RESEND_FROM, sendEmailSafely } from '@/lib/email/resend-client';
 
 export async function POST(request: Request) {
   const parsed = orderRequestSchema.safeParse(await request.json().catch(() => null));
@@ -72,14 +70,10 @@ export async function POST(request: Request) {
       })),
     });
 
-    // Best effort: a mail failure must never lose a placed order.
-    void sendOrderEmails({
-      orderId,
-      input,
-      items,
-      subtotalClp,
-      shippingCostClp,
-    }).catch(() => undefined);
+    // Aquí no se manda ningún correo: el pedido todavía no está pagado. El aviso
+    // al cliente y a MadLayerz sale al confirmarse el pago
+    // (`lib/email/paid-order-notification.ts`). Antes salía en este punto, así
+    // que quien abandonaba el checkout recibía igual una «confirmación».
 
     return NextResponse.json({ orderId, subtotalClp, shippingCostClp, totalClp: subtotalClp + shippingCostClp });
   } catch (error) {
@@ -98,54 +92,5 @@ export async function POST(request: Request) {
     }
 
     return NextResponse.json({ error: (error as Error).message }, { status: 500 });
-  }
-}
-
-async function sendOrderEmails({
-  orderId,
-  input,
-  items,
-  subtotalClp,
-  shippingCostClp,
-}: {
-  orderId: string;
-  input: { customerName: string; customerEmail: string; customerPhone: string; deliveryMethod: 'domicilio' | 'retiro'; region?: string; address?: string };
-  items: { name: string; quantity: number; unitPriceClp: number; variantName?: string }[];
-  subtotalClp: number;
-  shippingCostClp: number;
-}) {
-  const email = buildOrderConfirmationEmail({
-    orderId,
-    customerName: input.customerName,
-    items,
-    subtotalClp,
-    shippingCostClp,
-    deliveryMethod: input.deliveryMethod,
-    region: input.region,
-    address: input.address,
-  });
-
-  await sendEmailSafely('confirmación de pedido', (resend) =>
-    resend.emails.send({
-      from: RESEND_FROM,
-      to: input.customerEmail,
-      subject: email.subject,
-      text: email.text,
-      html: email.html,
-    })
-  );
-
-  // Y un aviso para quien tiene que imprimir la pieza.
-  const notifyTo = NOTIFICATION_EMAIL;
-  if (notifyTo) {
-    await sendEmailSafely('aviso interno de pedido', (resend) =>
-      resend.emails.send({
-        from: RESEND_FROM,
-        to: notifyTo,
-        replyTo: input.customerEmail,
-        subject: `Nuevo pedido #${orderId.slice(0, 8).toUpperCase()} — ${input.customerName}`,
-        text: `${input.customerName} (${input.customerEmail}, ${input.customerPhone})\n\n${email.text}`,
-      })
-    );
   }
 }

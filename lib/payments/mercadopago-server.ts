@@ -1,4 +1,5 @@
 import { createAdminSupabaseClient } from '@/lib/supabase/admin-client';
+import { sendPaidOrderEmails } from '@/lib/email/paid-order-notification';
 import {
   decidePayment,
   type MercadoPagoPayment,
@@ -90,13 +91,21 @@ export async function confirmMercadoPagoPayment(paymentId: string): Promise<Conf
   if (decision.action === 'mark_paid') {
     // La condición sobre status hace que dos confirmaciones simultáneas (webhook
     // y retorno del cliente) no pisen nada: sólo la primera actualiza.
-    const { error: updateError } = await admin
+    const { data: updated, error: updateError } = await admin
       .from('orders')
       .update({ status: 'pagado', paid_at: new Date().toISOString(), mp_payment_id: String(payment.id) })
       .eq('id', orderId)
-      .eq('status', 'pendiente_pago');
+      .eq('status', 'pendiente_pago')
+      .select('id');
 
     if (updateError) throw updateError;
+
+    // `select` devuelve sólo las filas que esta llamada actualizó, así que aquí
+    // se sabe cuál de las dos confirmaciones ganó la carrera. Sin eso, el
+    // webhook y el retorno del cliente mandarían el correo dos veces.
+    if ((updated ?? []).length > 0) {
+      await sendPaidOrderEmails(admin, orderId);
+    }
   }
 
   if (decision.action === 'reject') {

@@ -44,6 +44,27 @@ describe('buildOrderConfirmationEmail', () => {
     expect(text).not.toContain('Av. Siempre Viva');
   });
 
+  it('anuncia el pago recibido cuando la orden ya está pagada', () => {
+    const { subject, text, html } = buildOrderConfirmationEmail({ ...base, paid: true });
+
+    expect(subject).toContain('Pago confirmado');
+    expect(text).toContain('Recibimos tu pago');
+    expect(html).toContain('Recibimos tu pago');
+  });
+
+  it('no dice «pendiente de pago» después de cobrar', () => {
+    const { text, html } = buildOrderConfirmationEmail({ ...base, paid: true });
+
+    expect(text).not.toContain('pendiente de pago');
+    expect(html).not.toContain('pendiente de pago');
+  });
+
+  it('mantiene el aviso de pendiente de pago cuando aún no se cobra', () => {
+    const { text } = buildOrderConfirmationEmail(base);
+
+    expect(text).toContain('pendiente de pago');
+  });
+
   it('escapes HTML in customer-supplied values', () => {
     const { html } = buildOrderConfirmationEmail({ ...base, customerName: '<script>x</script>' });
     expect(html).not.toContain('<script>x</script>');
