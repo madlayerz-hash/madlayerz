@@ -14,6 +14,13 @@ const geist = localFont({
   display: 'swap',
 });
 
+const geistMono = localFont({
+  src: './fonts/GeistMonoVF.woff',
+  variable: '--font-geist-mono',
+  weight: '100 900',
+  display: 'swap',
+});
+
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
@@ -38,14 +45,14 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   themeColor: [
-    { media: '(prefers-color-scheme: light)', color: '#ffffff' },
-    { media: '(prefers-color-scheme: dark)', color: '#0a0a0a' },
+    { media: '(prefers-color-scheme: light)', color: '#f6f8f6' },
+    { media: '(prefers-color-scheme: dark)', color: '#0b0d0c' },
   ],
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="es" suppressHydrationWarning className={geist.variable}>
+    <html lang="es" suppressHydrationWarning className={`${geist.variable} ${geistMono.variable}`}>
       <body className="font-sans">
         <ThemeProvider>
           <a href="#contenido" className="skip-link">
