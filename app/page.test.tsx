@@ -15,7 +15,7 @@ describe('Home page', () => {
     const ui = await Page();
     render(ui as React.ReactElement);
 
-    expect(screen.getByRole('heading', { name: 'MadLayerz' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /Piezas que nacen/ })).toBeInTheDocument();
     expect(screen.getByText('Llavero de Prueba')).toBeInTheDocument();
   });
 });

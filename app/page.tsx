@@ -4,9 +4,11 @@ import { createSupabaseClient } from '@/lib/supabase/client';
 import { fetchProducts } from '@/lib/supabase/queries';
 import { SITE_DESCRIPTION } from '@/lib/site';
 import { Hero } from '@/components/home/Hero';
-import { FeaturedProducts } from '@/components/home/FeaturedProducts';
-import { CategoryChips } from '@/components/home/CategoryChips';
-import { QuoteBanner } from '@/components/home/QuoteBanner';
+import { Marquee } from '@/components/home/Marquee';
+import { FeaturedBento } from '@/components/home/FeaturedBento';
+import { ProcessSteps } from '@/components/home/ProcessSteps';
+import { CategoryTiles } from '@/components/home/CategoryTiles';
+import { QuoteCta } from '@/components/home/QuoteCta';
 
 /**
  * Without this the home page is baked at build time and never updates: it kept
@@ -34,9 +36,11 @@ export default async function Page() {
   return (
     <main>
       <Hero />
-      <FeaturedProducts products={products} />
-      <CategoryChips />
-      <QuoteBanner />
+      <Marquee />
+      <FeaturedBento products={products} />
+      <ProcessSteps />
+      <CategoryTiles />
+      <QuoteCta />
     </main>
   );
 }
