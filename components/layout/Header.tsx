@@ -45,15 +45,15 @@ export function Header() {
     return () => subscription.subscription.unsubscribe();
   }, []);
 
-  const linkClass = 'rounded-full px-3 py-2 transition-colors hover:bg-brand/10 md:px-2 md:py-1';
+  const linkClass = 'text-sm text-muted transition-colors hover:text-[color:var(--heading)]';
   // Tapping a link on a phone must also dismiss the panel it was tapped in.
   const closeMenu = () => setMenuOpen(false);
 
   return (
-    <header className="glass-surface sticky top-0 z-40 flex flex-wrap items-center justify-between gap-x-4 gap-y-3 px-4 py-3 sm:px-6 sm:py-4">
+    <header className="ml-header sticky top-0 z-40 flex flex-wrap items-center justify-between gap-x-4 gap-y-3 px-4 py-3 sm:px-6 sm:py-4">
       <Link
         href="/"
-        className="ml-brand flex items-center gap-2 text-xl font-extrabold"
+        className="ml-brand flex items-center gap-2 text-lg font-semibold tracking-tight"
         style={{ color: 'var(--heading)' }}
       >
         <Logo variant="mark" className="h-8 w-8 shrink-0" />
@@ -70,7 +70,7 @@ export function Header() {
         >
           🛒
           {mounted && itemCount > 0 && (
-            <span className="absolute -right-1 -top-1 rounded-full bg-brand px-1.5 text-xs font-semibold text-white">
+            <span className="absolute -right-1 -top-1 rounded-full bg-accent px-1.5 font-mono text-xs font-semibold text-on-accent">
               {itemCount}
             </span>
           )}
