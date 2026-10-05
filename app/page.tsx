@@ -4,6 +4,7 @@ import { createSupabaseClient } from '@/lib/supabase/client';
 import { fetchProducts } from '@/lib/supabase/queries';
 import { SITE_DESCRIPTION } from '@/lib/site';
 import { Hero } from '@/components/home/Hero';
+import { HeroPiece } from '@/components/home/hero-3d/HeroPiece';
 import { Marquee } from '@/components/home/Marquee';
 import { FeaturedBento } from '@/components/home/FeaturedBento';
 import { ProcessSteps } from '@/components/home/ProcessSteps';
@@ -35,7 +36,7 @@ export default async function Page() {
 
   return (
     <main>
-      <Hero />
+      <Hero art={<HeroPiece />} />
       <Marquee />
       <FeaturedBento products={products} />
       <ProcessSteps />
