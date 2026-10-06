@@ -242,7 +242,8 @@ label {
 .ml-marquee__track {
   display: flex;
   width: max-content;
-  animation: ml-marquee 40s linear infinite;
+  /* 120 s porque cada mitad tiene 3 filas: misma velocidad que antes con una. */
+  animation: ml-marquee 120s linear infinite;
 }
 
 @media (prefers-reduced-motion: reduce) {

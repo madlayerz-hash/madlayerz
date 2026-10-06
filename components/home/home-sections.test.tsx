@@ -3,7 +3,7 @@ import { FeaturedBento } from './FeaturedBento';
 import { CategoryTiles } from './CategoryTiles';
 import { Marquee } from './Marquee';
 import { Hero } from './Hero';
-import { CATEGORIES } from './copy';
+import { CATEGORIES, TECH_FACTS } from './copy';
 import type { Product } from '@/lib/catalog/types';
 
 beforeAll(() => {
@@ -52,9 +52,13 @@ describe('home', () => {
     });
   });
 
-  it('oculta la copia duplicada de la cinta a lectores de pantalla', () => {
+  it('los lectores de pantalla leen cada frase de la cinta una sola vez', () => {
     const { container } = render(<Marquee />);
-    expect(container.querySelectorAll('[aria-hidden="true"]')).toHaveLength(1);
+    const hidden = Array.from(container.querySelectorAll('[aria-hidden="true"]'));
+    TECH_FACTS.forEach((fact) => {
+      const visible = screen.getAllByText(fact).filter((el) => !hidden.some((h) => h.contains(el)));
+      expect(visible).toHaveLength(1);
+    });
   });
 
   it('el hero tiene un único h1 y los dos llamados', () => {

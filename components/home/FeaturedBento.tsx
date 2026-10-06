@@ -17,7 +17,7 @@ export function FeaturedBento({ products }: { products: Product[] }) {
             Destacados
           </h2>
         </div>
-        <Link href="/catalogo" className="-my-2 py-2 text-sm text-muted underline-offset-4 hover:underline">
+        <Link href="/catalogo" className="inline-flex min-h-11 items-center text-sm text-muted underline-offset-4 hover:underline">
           Ver todo
         </Link>
       </div>
