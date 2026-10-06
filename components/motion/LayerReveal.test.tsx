@@ -46,7 +46,7 @@ describe('LayerReveal', () => {
       </LayerReveal>
     );
     const wrapper = screen.getByText('Quieto').parentElement;
-    expect(wrapper?.className).toBe('x');
+    expect(wrapper?.className).toContain('x');
     expect(wrapper?.style.clipPath).toBe('');
   });
 

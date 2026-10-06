@@ -26,14 +26,17 @@ export function LayerReveal({
   delay?: number;
 }) {
   const reduce = useReducedMotion();
+  // La clase la usa globals.css para anular el clip-path con «reducir movimiento»
+  // incluso en el HTML del servidor, que no sabe la preferencia de la persona.
+  const classes = className ? `ml-layer-reveal ${className}` : 'ml-layer-reveal';
 
   // Con «reducir movimiento» el contenido tiene que estar ahí desde el principio,
   // no esperar a una animación que la persona pidió no ver.
-  if (reduce) return <div className={className}>{children}</div>;
+  if (reduce) return <div className={classes}>{children}</div>;
 
   return (
     <motion.div
-      className={className}
+      className={classes}
       initial={{ clipPath: 'inset(100% 0% 0% 0%)' }}
       whileInView={{ clipPath: 'inset(0% 0% 0% 0%)' }}
       viewport={REVEAL_VIEWPORT}

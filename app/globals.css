@@ -46,6 +46,12 @@ body {
   overflow-x: hidden;
 }
 
+/* La selección azul del navegador era lo único fuera de la paleta. */
+::selection {
+  background: var(--accent);
+  color: var(--on-accent);
+}
+
 .glass-card {
   background: var(--glass-bg);
   border: 1px solid var(--glass-border);
@@ -241,4 +247,8 @@ label {
 
 @media (prefers-reduced-motion: reduce) {
   .ml-marquee__track { animation: none; }
+
+  /* El servidor no conoce la preferencia y entrega LayerReveal oculto; al hidratar,
+     React no borra ese style del HTML. Sin esto la sección quedaba invisible. */
+  .ml-layer-reveal { clip-path: none !important; }
 }
