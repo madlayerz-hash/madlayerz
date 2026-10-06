@@ -7,6 +7,15 @@ const LAYERS = 12;
 // Avanza en saltos, como una impresora que sube de capa, no en un fundido continuo.
 const stepped = (t: number) => Math.min(1, Math.ceil(t * LAYERS) / LAYERS);
 
+/**
+ * Chrome descuenta el clip-path del propio elemento al medir la intersección: con
+ * `inset(100%)` la proporción visible es siempre 0, así que un umbral como 0.25
+ * nunca se cruzaba y el contenido quedaba oculto para siempre. Con umbral 0 basta
+ * con que entre al viewport; el margen negativo retrasa el revelado hasta que el
+ * bloque ya subió un poco en pantalla.
+ */
+export const REVEAL_VIEWPORT = { once: true, amount: 0, margin: '0px 0px -10% 0px' } as const;
+
 export function LayerReveal({
   children,
   className,
@@ -18,6 +27,8 @@ export function LayerReveal({
 }) {
   const reduce = useReducedMotion();
 
+  // Con «reducir movimiento» el contenido tiene que estar ahí desde el principio,
+  // no esperar a una animación que la persona pidió no ver.
   if (reduce) return <div className={className}>{children}</div>;
 
   return (
@@ -25,7 +36,7 @@ export function LayerReveal({
       className={className}
       initial={{ clipPath: 'inset(100% 0% 0% 0%)' }}
       whileInView={{ clipPath: 'inset(0% 0% 0% 0%)' }}
-      viewport={{ once: true, amount: 0.25 }}
+      viewport={REVEAL_VIEWPORT}
       transition={{ duration: 0.9, delay, ease: stepped }}
     >
       {children}
