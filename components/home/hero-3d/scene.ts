@@ -104,7 +104,9 @@ export function createPrintScene(
     tilt.x += (target.x - tilt.x) * 0.06;
     tilt.y += (target.y - tilt.y) * 0.06;
     const sway = Math.sin(elapsed * SWAY_RATE) * SWAY_AMPLITUDE;
-    piece.rotation.set(tilt.x, PIECE_BASE_YAW + sway + tilt.y, 0);
+    // El puntero no puede empujar más allá del vaivén: pasado ese borde se ve el perfil, que no se parece.
+    const yaw = Math.min(Math.max(PIECE_BASE_YAW + sway + tilt.y, PIECE_BASE_YAW - SWAY_AMPLITUDE), PIECE_BASE_YAW + SWAY_AMPLITUDE);
+    piece.rotation.set(tilt.x, yaw, 0);
 
     renderer.render(scene, camera);
     if (!firstFrameSent) {
