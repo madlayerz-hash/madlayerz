@@ -9,7 +9,7 @@ vi.mock('./render-env', () => ({
 describe('HeroPiece', () => {
   it('muestra la foto y no monta el canvas cuando no corresponde 3D', () => {
     const { container } = render(<HeroPiece />);
-    expect(screen.getByRole('img', { name: /frasco texturizado/i })).toBeInTheDocument();
+    expect(screen.getByRole('img', { name: /calavera arcoíris/i })).toBeInTheDocument();
     expect(container.querySelector('canvas')).toBeNull();
   });
 });

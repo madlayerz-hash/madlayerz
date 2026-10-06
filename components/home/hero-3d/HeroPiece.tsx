@@ -11,7 +11,7 @@ const PrintCanvas = dynamic(() => import('./PrintCanvas').then((m) => m.PrintCan
   loading: () => null,
 });
 
-const STATIC_SRC = '/products/frasco-texturizado-1.jpg';
+const STATIC_SRC = '/products/calavera-arcoiris-1.jpg';
 
 export function HeroPiece() {
   const [use3d, setUse3d] = useState(false);
@@ -26,7 +26,7 @@ export function HeroPiece() {
     <div className="absolute inset-0">
       <Image
         src={STATIC_SRC}
-        alt="Frasco texturizado impreso en 3D"
+        alt="Calavera arcoíris impresa en 3D"
         fill
         sizes="(max-width: 768px) 90vw, 520px"
         className={`rounded-3xl object-cover transition-opacity duration-700 ${ready ? 'opacity-0' : 'opacity-100'}`}

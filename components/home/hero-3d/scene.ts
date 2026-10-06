@@ -11,7 +11,7 @@ import {
   Vector3,
   WebGLRenderer,
 } from 'three';
-import { PIECE_HEIGHT, PIECE_RADIUS, buildPiece } from './model';
+import { PIECE_BASE_YAW, PIECE_HEIGHT, PIECE_RADIUS, buildPiece } from './model-calavera';
 import { clipHeightAt } from './print-progress';
 
 export interface SceneHandle {
@@ -19,6 +19,10 @@ export interface SceneHandle {
 }
 
 const TIMING = { durationMs: 2600, layers: 36, height: PIECE_HEIGHT };
+// Vaivén lento (un ciclo cada ~9 s) en vez de giro completo: la pieza sólo muestra
+// los ángulos en que se parece a la foto. Arranca en la vista base.
+const SWAY_AMPLITUDE = Math.PI / 6;
+const SWAY_RATE = (Math.PI * 2) / 9000;
 
 export function createPrintScene(
   canvas: HTMLCanvasElement,
@@ -79,7 +83,6 @@ export function createPrintScene(
   let running = false;
   let elapsed = 0;
   let last = 0;
-  let spin = 0;
   let firstFrameSent = false;
   // Sólo se dibuja cuando se ve: fuera de pantalla o con la pestaña oculta no gasta batería.
   let onScreen = true;
@@ -98,10 +101,10 @@ export function createPrintScene(
     ring.position.y = y;
     ring.visible = y < PIECE_HEIGHT;
 
-    spin += delta * 0.00025;
     tilt.x += (target.x - tilt.x) * 0.06;
     tilt.y += (target.y - tilt.y) * 0.06;
-    piece.rotation.set(tilt.x, spin + tilt.y, 0);
+    const sway = Math.sin(elapsed * SWAY_RATE) * SWAY_AMPLITUDE;
+    piece.rotation.set(tilt.x, PIECE_BASE_YAW + sway + tilt.y, 0);
 
     renderer.render(scene, camera);
     if (!firstFrameSent) {
