@@ -2,7 +2,7 @@
  * Todos los textos con afirmaciones sobre el taller están aquí para que Pablo
  * los revise en un solo lugar: no se publica nada técnico que no sea cierto.
  */
-export const TECH_FACTS = ['Impresión 3D', 'Hecho en Chile', 'Piezas a pedido', 'Diseños a medida', 'Despacho a regiones'];
+export const TECH_FACTS = ['Impresión 3D', 'Hecho en Chile', 'Piezas a pedido', 'Diseños a medida'];
 
 export const CATEGORIES = [
   { slug: 'llaveros', name: 'Llaveros' },
