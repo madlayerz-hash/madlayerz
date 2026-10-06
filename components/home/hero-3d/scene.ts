@@ -150,6 +150,8 @@ export function createPrintScene(
           materials.forEach((material) => material.dispose());
         }
       });
+      // Sin forceContextLoss(): en strict mode React vuelve a montar sobre el mismo
+      // <canvas>, y un contexto perdido a la fuerza deja al renderer nuevo sin WebGL.
       renderer.dispose();
     },
   };

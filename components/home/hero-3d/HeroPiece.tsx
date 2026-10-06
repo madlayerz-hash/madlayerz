@@ -28,6 +28,8 @@ export function HeroPiece() {
         src={STATIC_SRC}
         alt="Calavera arcoíris impresa en 3D"
         fill
+        // Es lo primero que se ve a la derecha del título mientras el 3D carga (o si no carga).
+        priority
         sizes="(max-width: 768px) 90vw, 520px"
         className={`rounded-3xl object-cover transition-opacity duration-700 ${ready ? 'opacity-0' : 'opacity-100'}`}
       />

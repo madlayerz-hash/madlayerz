@@ -8,6 +8,20 @@ import type { Role } from '@/lib/auth/types';
 import { ThemeToggle } from './ThemeToggle';
 import { Logo } from '@/components/brand/Logo';
 
+// Íconos de trazo propio en vez de emoji: el emoji sale con los colores del sistema
+// operativo (gris en Windows, a todo color en iOS) y no sigue el tema ni el acento.
+const iconProps = {
+  width: 20,
+  height: 20,
+  viewBox: '0 0 24 24',
+  fill: 'none',
+  stroke: 'currentColor',
+  strokeWidth: 1.75,
+  strokeLinecap: 'round' as const,
+  strokeLinejoin: 'round' as const,
+  'aria-hidden': true,
+};
+
 export function Header() {
   const openDrawer = useCartStore((state) => state.openDrawer);
   const itemCount = useCartStore((state) => state.items.reduce((sum, i) => sum + i.quantity, 0));
@@ -45,7 +59,8 @@ export function Header() {
     return () => subscription.subscription.unsubscribe();
   }, []);
 
-  const linkClass = 'text-sm text-muted transition-colors hover:text-[color:var(--heading)]';
+  // En el menú del celular cada enlace necesita ~44 px de alto para tocarlo con el dedo.
+  const linkClass = 'py-2.5 text-sm text-muted transition-colors hover:text-[color:var(--heading)] md:py-0';
   // Tapping a link on a phone must also dismiss the panel it was tapped in.
   const closeMenu = () => setMenuOpen(false);
 
@@ -66,9 +81,13 @@ export function Header() {
         <button
           aria-label={`Carrito${itemCount > 0 ? ` (${itemCount} artículos)` : ''}`}
           onClick={openDrawer}
-          className="relative rounded-full p-2 text-lg"
+          className="relative flex h-11 w-11 items-center justify-center rounded-full transition-colors hover:text-[color:var(--heading)]"
         >
-          🛒
+          <svg {...iconProps}>
+            <path d="M3 4h2l2.4 10.2a1 1 0 0 0 1 .8h8.9a1 1 0 0 0 1-.8L20 8H6.2" />
+            <circle cx="9.5" cy="19" r="1.25" />
+            <circle cx="17" cy="19" r="1.25" />
+          </svg>
           {mounted && itemCount > 0 && (
             <span className="absolute -right-1 -top-1 rounded-full bg-accent px-1.5 font-mono text-xs font-semibold text-on-accent">
               {itemCount}
@@ -84,9 +103,17 @@ export function Header() {
           aria-expanded={menuOpen}
           aria-controls="menu-principal"
           onClick={() => setMenuOpen((open) => !open)}
-          className="rounded-full p-2 text-lg md:hidden"
+          className="flex h-11 w-11 items-center justify-center rounded-full md:hidden"
         >
-          {menuOpen ? '✕' : '☰'}
+          {menuOpen ? (
+            <svg {...iconProps}>
+              <path d="M6 6l12 12M18 6L6 18" />
+            </svg>
+          ) : (
+            <svg {...iconProps}>
+              <path d="M4 7h16M4 12h16M4 17h16" />
+            </svg>
+          )}
         </button>
       </div>
 

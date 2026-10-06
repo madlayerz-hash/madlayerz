@@ -4,8 +4,7 @@ import { PROCESS_STEPS } from './copy';
 export function ProcessSteps() {
   return (
     <section className="mx-auto max-w-6xl px-6 py-20">
-      <p className="font-mono text-xs uppercase tracking-[0.25em] text-muted">Cómo se hace</p>
-      <h2 className="mt-2 max-w-xl text-3xl font-semibold tracking-tight sm:text-4xl" style={{ color: 'var(--heading)' }}>
+      <h2 className="max-w-xl text-3xl font-semibold tracking-tight sm:text-4xl" style={{ color: 'var(--heading)' }}>
         De un archivo a una pieza en tus manos.
       </h2>
       <ol className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">

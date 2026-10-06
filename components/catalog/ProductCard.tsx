@@ -55,12 +55,14 @@ export function ProductCard({
       <div className="mt-1 flex items-center justify-between gap-2">
         <p className="font-mono text-sm text-accent-text">{formatClp(product.priceClp)}</p>
         {hasChoice && (
-          <div className="flex items-center gap-1" aria-label={`${variants.length} colores disponibles`}>
+          // role="img": un aria-label en un div genérico no lo lee ningún lector de pantalla.
+          <div className="flex items-center gap-1" role="img" aria-label={`${variants.length} colores disponibles`}>
             {variants.slice(0, 5).map((variant) => (
               <span
                 key={variant.name}
                 title={variant.name}
-                className="h-3 w-3 rounded-full border border-line"
+                // Borde en --muted: con --line un color oscuro desaparecía sobre la tarjeta oscura.
+                className="h-3 w-3 rounded-full border border-[color:var(--muted)]"
                 style={{ background: variant.colorHex ?? 'transparent' }}
               />
             ))}
@@ -71,7 +73,7 @@ export function ProductCard({
       {hasChoice ? (
         <Link
           href={`/producto/${product.slug}`}
-          className="mt-3 rounded-full border border-line px-4 py-2 text-center text-sm font-medium transition-colors hover:border-[color:var(--accent)]"
+          className="mt-3 flex min-h-11 items-center justify-center rounded-full border border-line px-3 text-center text-sm font-medium transition-colors hover:border-[color:var(--accent)]"
         >
           Elegir color
         </Link>
@@ -87,7 +89,7 @@ export function ProductCard({
             });
             openDrawer();
           }}
-          className="mt-3 rounded-full bg-accent py-2 text-sm font-medium text-on-accent transition-transform active:scale-[0.98]"
+          className="mt-3 min-h-11 rounded-full bg-accent px-3 text-sm font-medium text-on-accent transition-transform active:scale-[0.98]"
         >
           Agregar al carrito
         </button>

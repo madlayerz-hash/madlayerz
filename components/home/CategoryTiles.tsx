@@ -4,7 +4,9 @@ import { CATEGORIES } from './copy';
 export function CategoryTiles() {
   return (
     <section className="mx-auto max-w-6xl px-6 py-20">
-      <p className="font-mono text-xs uppercase tracking-[0.25em] text-muted">Categorías</p>
+      <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl" style={{ color: 'var(--heading)' }}>
+        Categorías
+      </h2>
       <div className="mt-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
         {CATEGORIES.map((category) => (
           <Link

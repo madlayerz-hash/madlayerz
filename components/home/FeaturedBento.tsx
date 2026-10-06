@@ -3,7 +3,9 @@ import type { Product } from '@/lib/catalog/types';
 import { ProductCard } from '@/components/catalog/ProductCard';
 
 export function FeaturedBento({ products }: { products: Product[] }) {
-  const featured = products.filter((p) => p.featured).slice(0, 7);
+  // La primera celda ocupa 2×2: con 5 piezas la grilla de 4 columnas queda en dos filas
+  // completas; con 7 sobraban dos huecos al final.
+  const featured = products.filter((p) => p.featured).slice(0, 5);
 
   if (featured.length === 0) return null;
 
@@ -11,12 +13,11 @@ export function FeaturedBento({ products }: { products: Product[] }) {
     <section className="mx-auto max-w-6xl px-6 py-20">
       <div className="mb-8 flex items-end justify-between gap-4">
         <div>
-          <p className="font-mono text-xs uppercase tracking-[0.25em] text-muted">Recién salidas de la cama</p>
-          <h2 className="mt-2 text-3xl font-semibold tracking-tight sm:text-4xl" style={{ color: 'var(--heading)' }}>
+          <h2 className="text-3xl font-semibold tracking-tight sm:text-4xl" style={{ color: 'var(--heading)' }}>
             Destacados
           </h2>
         </div>
-        <Link href="/catalogo" className="text-sm text-muted underline-offset-4 hover:underline">
+        <Link href="/catalogo" className="-my-2 py-2 text-sm text-muted underline-offset-4 hover:underline">
           Ver todo
         </Link>
       </div>
