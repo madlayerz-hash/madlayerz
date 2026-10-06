@@ -59,8 +59,8 @@ export function Header() {
     return () => subscription.subscription.unsubscribe();
   }, []);
 
-  // En el menú del celular cada enlace necesita ~44 px de alto para tocarlo con el dedo.
-  const linkClass = 'py-2.5 text-sm text-muted transition-colors hover:text-[color:var(--heading)] md:py-0';
+  // En el menú del celular cada enlace necesita 44 px de alto para tocarlo con el dedo.
+  const linkClass = 'py-3 text-sm text-muted transition-colors hover:text-[color:var(--heading)] md:py-0';
   // Tapping a link on a phone must also dismiss the panel it was tapped in.
   const closeMenu = () => setMenuOpen(false);
 
