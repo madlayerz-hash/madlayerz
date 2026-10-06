@@ -20,7 +20,7 @@ export function AddToCartButton({ product }: { product: Product }) {
         // Nothing used to happen on screen when you clicked this.
         openDrawer();
       }}
-      className="mt-4 rounded-full bg-brand px-6 py-3 font-semibold text-white transition-transform hover:scale-105"
+      className="mt-4 rounded-full bg-accent px-6 py-3 font-semibold text-on-accent transition-transform hover:scale-105"
     >
       Agregar al carrito
     </button>

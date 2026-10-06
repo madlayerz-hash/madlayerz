@@ -43,7 +43,7 @@ export function CartDrawer() {
                   closeDrawer();
                   router.push('/checkout');
                 }}
-                className="mt-4 w-full rounded-full bg-brand py-3 font-semibold text-white transition-transform hover:scale-105"
+                className="mt-4 w-full rounded-full bg-accent py-3 font-semibold text-on-accent transition-transform hover:scale-105"
               >
                 Ir a pagar
               </button>

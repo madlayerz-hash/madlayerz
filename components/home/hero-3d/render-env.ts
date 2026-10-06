@@ -22,7 +22,10 @@ export function readRenderEnv(): RenderEnv {
   let webgl = false;
   try {
     const canvas = document.createElement('canvas');
-    webgl = Boolean(canvas.getContext('webgl2') ?? canvas.getContext('webgl'));
+    const gl = canvas.getContext('webgl2') ?? canvas.getContext('webgl');
+    webgl = Boolean(gl);
+    // El contexto de prueba no se usa: se libera para no gastar uno del límite del navegador.
+    (gl?.getExtension('WEBGL_lose_context') as { loseContext(): void } | null | undefined)?.loseContext();
   } catch {
     webgl = false;
   }

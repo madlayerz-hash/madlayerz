@@ -54,6 +54,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="es" suppressHydrationWarning className={`${geist.variable} ${geistMono.variable}`}>
       <body className="font-sans">
+        {/* Sin JS, LayerReveal queda recortado (clip-path del render del servidor) y las
+            fotos no se ven; esto lo anula sólo cuando JavaScript está desactivado. */}
+        <noscript>
+          <style>{'.ml-layer-reveal{clip-path:none!important}'}</style>
+        </noscript>
         <ThemeProvider>
           <a href="#contenido" className="skip-link">
             Saltar al contenido

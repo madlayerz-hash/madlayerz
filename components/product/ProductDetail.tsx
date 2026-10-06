@@ -138,7 +138,7 @@ export function ProductDetail({ product }: { product: Product }) {
 
         <button
           onClick={handleAdd}
-          className="mt-6 w-full rounded-full bg-brand px-6 py-3 font-semibold text-white transition-transform hover:scale-[1.02] sm:w-auto"
+          className="mt-6 w-full rounded-full bg-accent px-6 py-3 font-semibold text-on-accent transition-transform hover:scale-[1.02] sm:w-auto"
         >
           Agregar al carrito
         </button>
